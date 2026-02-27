@@ -100,7 +100,7 @@ const SUN_STOPS = [
   { at: 0.4, color: [166, 217, 237] },
   { at: 0.6, color: [254, 227, 145] },
   { at: 0.8, color: [244, 109, 67] },
-  { at: 1, color: [255, 204, 0] },
+  { at: 1, color: [165, 0, 38] },
 ];
 const STOP_MAP = { temperature: TEMP_STOPS, precipitation: PRECIP_STOPS, sunshine: SUN_STOPS };
 
