@@ -20,9 +20,15 @@
 # production
 /build
 
+# cache
+.cache/
+*.cache
+.swc/
+
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -39,3 +45,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# data - raw/heavy files (NetCDF, etc.)
+*.nc
+*.nc4
+*.hdf5
+*.grib
+*.grib2
+data/raw/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
