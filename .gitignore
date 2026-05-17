@@ -1,0 +1,61 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Data - raw/heavy files excluded, processed data committed
+data/raw/
+data/cache/
+*.nc
+*.nc4
+*.hdf5
+*.grib
+*.grib2
+
+# Node / Next.js
+node_modules/
+.next/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+coverage/
+out/
+build/
+.cache/
+*.cache
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment
+.env*
+
+# Vercel
+.vercel
+
+# Claude
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Notebooks
+*.sqlite
+.cache.sqlite
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.pem

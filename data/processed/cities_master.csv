@@ -1,0 +1,232 @@
+city,country,lat,lon
+Zurich, Switzerland,47.3744,8.541
+Geneva, Switzerland,46.2018,6.1466
+Basel, Switzerland,47.5581,7.5878
+Lausanne, Switzerland,46.5218,6.6327
+Lugano, Switzerland,46.005,8.952
+Bern, Switzerland,46.9485,7.4522
+Reykjavik, Iceland,64.146,-21.9422
+Oslo, Norway,59.9133,10.739
+Trondheim, Norway,63.4304,10.3952
+Bergen, Norway,60.3943,5.3259
+London, United Kingdom,51.5074,-0.1278
+Stavanger, Norway,58.97,5.7318
+Copenhagen, Denmark,55.6867,12.5701
+Amsterdam, Netherlands,52.3731,4.8925
+Pisa, Italy,43.4715,10.6798
+Stockholm, Sweden,59.3251,18.0711
+Luxembourg, Luxembourg,49.8159,6.1297
+Haarlem, Netherlands,52.3837,4.6436
+Aalborg, Denmark,57.0463,9.9215
+Aarhus, Denmark,56.1496,10.2134
+Paris, France,48.8535,2.3484
+Utrecht, Netherlands,52.0907,5.1216
+Salzburg, Austria,47.7981,13.0465
+Munich, Germany,48.1371,11.5754
+Espoo, Finland,60.205,24.656
+Dublin, Ireland,53.3494,-6.2606
+Odense, Denmark,55.3997,10.3852
+Guildford, United Kingdom,51.2356,-0.5732
+Oxford, United Kingdom,51.752,-1.2578
+Vienna, Austria,48.2084,16.3725
+Nice, France,43.7009,7.2684
+Milan, Italy,45.4642,9.1896
+Delft, Netherlands,51.9995,4.3627
+Rotterdam, Netherlands,51.9244,4.4778
+Frankfurt, Germany,50.1106,8.6821
+Brighton, United Kingdom,50.8215,-0.1401
+The Hague (Den Haag), Netherlands,52.102,4.2982
+Helsinki, Finland,60.1666,24.9435
+Strasbourg, France,48.5846,7.7507
+Marseille, France,43.2962,5.37
+Lyon, France,45.7578,4.832
+Wiesbaden, Germany,50.082,8.2417
+Heidelberg, Germany,49.4094,8.6947
+Cambridge, United Kingdom,52.2055,0.1187
+Dusseldorf, Germany,51.2254,6.7763
+Brussels, Belgium,50.8467,4.3525
+Erfurt, Germany,50.9778,11.0287
+Galway, Ireland,53.2744,-9.0491
+Edinburgh, United Kingdom,55.9533,-3.1884
+Gent, Belgium,51.0538,3.725
+Essen, Germany,51.4582,7.0158
+Darmstadt, Germany,49.8728,8.6512
+Cologne, Germany,50.9384,6.96
+Karlsruhe, Germany,49.0069,8.4034
+Cork, Ireland,51.8985,-8.4726
+Antwerp, Belgium,51.2211,4.3997
+Leiden, Netherlands,52.1595,4.4909
+Hamburg, Germany,53.5503,10.0007
+Reading, United Kingdom,51.4515,-0.9836
+Eindhoven, Netherlands,51.4393,5.4786
+Graz, Austria,47.0709,15.4383
+Stuttgart, Germany,48.7784,9.18
+Dortmund, Germany,51.5142,7.4653
+Augsburg, Germany,48.369,10.898
+Uppsala, Sweden,59.8586,17.6387
+Bristol, United Kingdom,51.4538,-2.5973
+Berlin, Germany,52.5174,13.3951
+Southampton, United Kingdom,50.9025,-1.4042
+Mainz, Germany,49.9995,8.2736
+Malmo, Sweden,55.6053,13.0002
+Toulouse, France,43.6045,1.4442
+Nuremberg, Germany,49.4539,11.0773
+Kiel, Germany,54.3227,10.1356
+Groningen, Netherlands,53.2191,6.568
+Bremen, Germany,53.0758,8.8072
+Bonn, Germany,50.7353,7.1025
+Florence, Italy,43.7698,11.2556
+Turku, Finland,60.4516,22.267
+Dresden, Germany,51.0493,13.7381
+Linz, Austria,48.3059,14.2862
+Birmingham, United Kingdom,52.4797,-1.9027
+Brescia, Italy,45.7796,10.4259
+Limerick, Ireland,52.6613,-8.6301
+Bordeaux, France,44.8412,-0.58
+York, United Kingdom,53.9657,-1.0743
+Bologna, Italy,44.4938,11.3426
+Manchester, United Kingdom,53.4795,-2.2451
+Hanover, Germany,52.3745,9.7386
+Mannheim, Germany,49.4893,8.4673
+Glasgow, United Kingdom,55.8612,-4.2502
+Gothenburg, Sweden,57.7072,11.967
+Leipzig, Germany,51.3406,12.3747
+Belfast, United Kingdom,54.5976,-5.9277
+Newcastle upon Tyne, United Kingdom,54.9738,-1.6132
+Leeds, United Kingdom,53.7974,-1.5438
+Bournemouth, United Kingdom,50.7202,-1.8799
+Treviso, Italy,45.8067,12.2063
+Milton Keynes, United Kingdom,52.0407,-0.7594
+Aachen, Germany,50.7764,6.0839
+Lund, Sweden,55.7029,13.1929
+Cardiff, United Kingdom,51.4817,-3.1792
+Grenoble, France,45.1876,5.7358
+Erlangen, Germany,49.5892,10.9812
+Montpellier, France,43.6112,3.8767
+Lille, France,50.6366,3.0635
+Verona, Italy,45.4425,10.9857
+Chemnitz, Germany,50.8324,12.9189
+Nottingham, United Kingdom,52.9534,-1.1496
+Bolzano-Bozen, Italy,46.6559,11.2302
+Tallinn, Estonia,59.4372,24.7573
+Liverpool, United Kingdom,53.4072,-2.9917
+Braunschweig, Germany,52.2647,10.5236
+Sliema, Malta,35.9128,14.5021
+Trento, Italy,46.0664,11.1258
+Padova, Italy,45.3914,11.8058
+Coventry, United Kingdom,52.4082,-1.5105
+Villach, Austria,46.6167,13.85
+Leuven, Belgium,50.8792,4.7012
+Sheffield, United Kingdom,53.3807,-1.4702
+Cagliari, Italy,39.2172,9.1133
+Genoa, Italy,44.4073,8.9339
+Trieste, Italy,45.6496,13.7773
+Rome, Italy,41.8933,12.4829
+Turin, Italy,45.0678,7.6825
+Naples, Italy,40.8359,14.2488
+Rimini, Italy,43.9465,12.6307
+Valletta, Malta,35.899,14.5137
+Palma de Mallorca, Spain,39.5696,2.6501
+Prague, Czech Republic,50.0875,14.4213
+Barcelona, Spain,41.3826,2.1771
+Remagen, Germany,50.5792,7.2287
+Reggio Nell'emilia, Italy,44.6087,10.5941
+Bergamo, Italy,45.7567,9.7542
+Madrid, Spain,40.4168,-3.7035
+Split, Croatia,43.5116,16.44
+Tartu, Estonia,58.378,26.729
+Ljubljana, Slovenia,46.05,14.5069
+Athens, Greece,37.9756,23.7348
+Bari, Italy,41.1258,16.862
+Heraklion, Greece,35.3391,25.1333
+Palermo, Italy,38.1112,13.3524
+Bratislava, Slovakia,48.1559,17.1314
+Bilbao, Spain,43.263,-2.935
+Riga, Latvia,56.9494,24.1052
+Thessaloniki, Greece,40.6403,22.9353
+Lisbon, Portugal,38.7078,-9.1366
+Rijeka, Croatia,45.3268,14.4422
+Santa Cruz de Tenerife, Spain,28.4672,-16.2508
+Zagreb, Croatia,45.8131,15.9773
+Oviedo, Spain,43.3533,-5.8795
+Brno, Czech Republic,49.1922,16.6113
+Warsaw, Poland,52.2334,21.0711
+Vilnius, Lithuania,54.687,25.2829
+Kaunas, Lithuania,54.8982,23.9045
+Catania, Italy,37.5024,15.0874
+Valencia, Spain,39.4697,-0.3763
+Kosice, Slovakia,48.7172,21.2497
+Alicante, Spain,38.3436,-0.4882
+Budapest, Hungary,47.4979,19.0402
+Malaga, Spain,36.7213,-4.4216
+Plzen, Czech Republic,49.7477,13.3775
+Krakow (Cracow), Poland,50.0699,19.9715
+Wroclaw, Poland,51.1263,16.9782
+Moscow, Russia,55.6256,37.6064
+Las Palmas de Gran Canaria, Spain,28.1289,-15.4349
+Ostrava, Czech Republic,49.8349,18.282
+Gdansk, Poland,54.3483,18.654
+Porto, Portugal,41.1502,-8.6103
+Tirana, Albania,41.3281,19.8184
+Gdynia, Poland,54.5233,18.604
+Seville (Sevilla), Spain,37.3868,-5.9936
+Budva, Montenegro,42.2886,18.842
+Granada, Spain,37.1735,-3.5995
+Pecs, Hungary,46.0765,18.228
+Belgrade, Serbia,44.8153,20.4457
+Funchal, Portugal,32.6496,-16.9087
+Lodz, Poland,51.7687,19.457
+Olomouc, Czech Republic,49.5941,17.2511
+Braga, Portugal,41.5511,-8.428
+Coimbra, Portugal,40.2112,-8.4295
+Poznan, Poland,52.4083,16.9335
+Sofia, Bulgaria,42.6977,23.3217
+Debrecen, Hungary,47.5314,21.626
+Bucharest, Romania,44.4361,26.1027
+Cluj-Napoca, Romania,46.7694,23.59
+Szczecin, Poland,53.4302,14.551
+Szeged, Hungary,46.2546,20.1486
+Novi Sad, Serbia,45.2551,19.8452
+Varna, Bulgaria,43.2074,27.9167
+Vladivostok, Russia,60.1666,24.9435
+Katowice, Poland,50.2137,19.0059
+Brasov, Romania,45.6525,25.6106
+Constanta, Romania,44.1767,28.6508
+Sarajevo, Bosnia And Herzegovina,43.8571,18.4126
+Podgorica, Montenegro,42.4415,19.2621
+Saint Petersburg, Russia,59.9607,30.1587
+Timisoara, Romania,45.7538,21.2257
+Iasi, Romania,47.1616,27.5838
+Plovdiv, Bulgaria,42.1419,24.7499
+Yekaterinburg, Russia,56.8382,60.6008
+Tyumen, Russia,57.1535,65.5423
+Burgas, Bulgaria,42.4937,27.4721
+Craiova, Romania,44.319,23.7966
+Kaliningrad, Russia,54.7046,20.4566
+Galati, Romania,45.4338,28.0549
+Targu Mures, Romania,46.5446,24.5612
+Krasnoyarsk, Russia,56.0091,92.8726
+Skopje, North Macedonia,41.9962,21.4319
+Sibiu, Romania,45.7974,24.1519
+Kazan, Russia,55.7946,49.1115
+Oradea, Romania,47.0549,21.9285
+Nis, Serbia,43.3163,21.9212
+Ufa, Russia,54.7261,55.9475
+Krasnodar, Russia,45.0352,38.9772
+Chisinau, Moldova,47.0245,28.8323
+Novosibirsk, Russia,55.0288,82.9227
+Nizhny Novgorod, Russia,56.1301,44.1365
+Samara, Russia,53.1956,50.1015
+Voronezh, Russia,51.68,39.1837
+Tomsk, Russia,58.6124,82.0475
+Rostov-on-Don (Rostov-na-donu), Russia,47.2038,39.7325
+Chelyabinsk, Russia,55.1598,61.4026
+Perm, Russia,58.0109,56.2319
+Stara Zagora, Bulgaria,42.4248,25.6257
+Minsk, Belarus,53.9025,27.5618
+Kiev (Kyiv), Ukraine,50.4486,30.5272
+Dnipro, Ukraine,51.9191,30.8243
+Lviv, Ukraine,49.842,24.0316
+Odessa (Odesa), Ukraine,46.4829,30.724
+Pristina, Kosovo (Disputed Territory),,
+Kharkiv, Ukraine,49.9923,36.231
