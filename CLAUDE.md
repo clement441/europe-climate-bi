@@ -20,15 +20,15 @@ europe-climate-bi/
 ```
 
 ## Data Pipeline (scripts/)
-Run scripts in numbered order to regenerate processed data from raw ERA5 files.
+- `update_cities.py` — End-to-end pipeline for the city dataset: geocodes new cities
+  via Nominatim, fetches climate projections from Open-Meteo, computes resilience
+  scores, and exports `cities_all.json` into both `data/processed/` and
+  `web/public/data/`. Re-runs are incremental — only new cities are geocoded and
+  projected.
 
-- `01_download_era5.py` — Downloads ERA5 climate normals via CDS API
-- `02_process_climate.py` — Processes raw NetCDF into per-month JSON arrays
-- `03_fetch_cost_of_living.py` — Fetches city cost-of-living data
-- `04_fetch_projections.py` — Fetches future climate projections per city
-- `05_build_resilience_score.py` — Computes resilience scores for cities
-- `06_export_for_frontend.py` — Exports final JSON files into web/public/data/
-- `utils.py` — Shared helpers
+The ERA5 climate-grid normals (`web/public/data/climate_normals/climate_*.json`)
+are processed separately and committed under `data/processed/`. The processing
+notebook lives in `notebooks/`.
 
 Python environment: activate `.venv` before running scripts.
 

@@ -24,6 +24,10 @@ print("=" * 50, flush=True)
 print("STEP 1: Checking for new cities...", flush=True)
 
 costs = pd.read_csv(RAW_COSTS)
+# Source CSV has rows like "Zurich, Switzerland" where country is parsed with a
+# leading space. Strip both columns so the space doesn't propagate to the JSON.
+costs['city'] = costs['city'].str.strip()
+costs['country'] = costs['country'].str.strip()
 
 # Load existing master if it exists
 if os.path.exists(MASTER_CSV):
@@ -42,7 +46,7 @@ else:
 # ============================================================
 if len(new_rows) > 0:
     print("\nSTEP 2: Geocoding new cities...", flush=True)
-    geolocator = Nominatim(user_agent="europe-climate-bi")
+    geolocator = Nominatim(user_agent="europe-climate-bi/1.0 (clement@datasaku.com)")
     new_coords = []
 
     for i, row in new_rows.iterrows():
