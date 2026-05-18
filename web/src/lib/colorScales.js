@@ -20,10 +20,16 @@ function multiStopColor(ratio, stops) {
   return stops[stops.length - 1].color;
 }
 
+// ColorBrewer RdYlBu reversed (5-stop). Pale yellow at the midpoint is the key
+// improvement over a pure-white center: shoulder-season months (March/April) where
+// most of Europe sits around 5–15 °C now read as a soft yellow instead of washing
+// out into the basemap.
 export const TEMP_STOPS = [
-  { at: 0, color: [33, 102, 172] },
-  { at: 0.5, color: [255, 255, 255] },
-  { at: 1, color: [178, 24, 43] },
+  { at: 0.00, color: [44, 123, 182] },
+  { at: 0.25, color: [171, 217, 233] },
+  { at: 0.50, color: [255, 255, 191] },
+  { at: 0.75, color: [253, 174, 97] },
+  { at: 1.00, color: [215, 25, 28] },
 ];
 export const PRECIP_STOPS = [
   { at: 0, color: [255, 255, 204] },
@@ -48,7 +54,9 @@ export function getColor(variable, value, min, max) {
   const range = max - min;
   const ratio = range === 0 ? 0.5 : Math.max(0, Math.min(1, (value - min) / range));
   const [r, g, b] = multiStopColor(ratio, STOP_MAP[variable]);
-  return [r, g, b, 179];
+  // Alpha 150 (was 179) keeps colors saturated but lets basemap borders/labels
+  // read through more cleanly.
+  return [r, g, b, 150];
 }
 
 export const GREEN_RED_STOPS = [

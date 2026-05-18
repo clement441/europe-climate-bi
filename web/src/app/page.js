@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import { ScatterplotLayer, SolidPolygonLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, ScatterplotLayer, SolidPolygonLayer } from "@deck.gl/layers";
 import {
   STOP_MAP,
   GREEN_RED_STOPS,
@@ -83,9 +83,9 @@ export default function Home() {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const overlayRef = useRef(null);
-  // Holds the most recent instance of each deck.gl layer so the heatmap and
-  // city-bubble effects can update independently without rebuilding the other.
-  const layersRef = useRef({ heatmap: null, cities: null });
+  // Holds the most recent instance of each deck.gl layer so each effect can update
+  // independently without rebuilding the others.
+  const layersRef = useRef({ heatmap: null, borders: null, cities: null });
 
   const [month, setMonth] = useState(6);
   const [variable, setVariable] = useState("temperature");
@@ -97,6 +97,7 @@ export default function Home() {
 
   const [hoverInfo, setHoverInfo] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [borders, setBorders] = useState(null);
   // bubbleRange is state (not a ref) so the city-layer effect re-runs when it changes,
   // guaranteeing the layer is rebuilt with the correct color range on first paint.
   const [bubbleRange, setBubbleRange] = useState({ min: 0, max: 1 });
@@ -148,6 +149,13 @@ export default function Home() {
         console.error("Failed to load cities:", err);
         setError("Could not load city data.");
       });
+    // Natural Earth boundary lines, pre-clipped to Europe. Drawn above the heatmap
+    // so borders stay legible even when the basemap's subtle gray lines get washed
+    // out by the colored heatmap.
+    fetch("/data/borders.geojson")
+      .then((res) => res.ok ? res.json() : null)
+      .then(setBorders)
+      .catch(() => {});
     // fetchMonth is stable (useCallback with []) — including it satisfies the lint rule.
     // `month` is intentionally omitted: this effect runs only on mount; subsequent month
     // changes flow through handleMonthChange, which calls fetchMonth directly.
@@ -201,8 +209,11 @@ export default function Home() {
 
   const flushLayers = useCallback(() => {
     if (!overlayRef.current) return;
-    const { heatmap, cities: cityLayer } = layersRef.current;
-    overlayRef.current.setProps({ layers: [heatmap, cityLayer].filter(Boolean) });
+    const { heatmap, borders: bordersLayer, cities: cityLayer } = layersRef.current;
+    // Order matters: heatmap (bottom) → borders → city bubbles (top).
+    overlayRef.current.setProps({
+      layers: [heatmap, bordersLayer, cityLayer].filter(Boolean),
+    });
   }, []);
 
   // Heatmap layer — rebuilds only when climate data or selected variable changes.
@@ -262,6 +273,26 @@ export default function Home() {
     flushLayers();
   }, [climateData, variable, flushLayers]);
 
+  // Borders overlay — rebuilds once when the GeoJSON loads. beforeId "place_continent"
+  // is the lowest place/label layer in CartoDB Positron, so borders render ABOVE the
+  // heatmap and basemap boundaries but BELOW all country/city labels.
+  useEffect(() => {
+    if (!borders || !overlayRef.current) return;
+    layersRef.current.borders = new GeoJsonLayer({
+      id: "country-borders",
+      beforeId: "place_continent",
+      data: borders,
+      stroked: true,
+      filled: false,
+      pickable: false,
+      getLineColor: [40, 40, 40, 220],
+      getLineWidth: 1,
+      lineWidthMinPixels: 1.2,
+      lineWidthMaxPixels: 2.5,
+    });
+    flushLayers();
+  }, [borders, flushLayers]);
+
   // City bubble layer — rebuilds only when the city dataset, selected metric, or color
   // range changes. Omitting beforeId places this layer at the top of the MapLibre stack
   // so bubbles near coastlines stay as complete circles (not clipped by water polygons).
@@ -319,146 +350,255 @@ export default function Home() {
     fetchMonth(idx);
   };
 
+  // Placeholder for the month auto-cycle feature (Phase 3).
+  const handlePlayClick = () => {};
+
   const { unit } = VARIABLES[variable];
   const currentBubbleMetric = BUBBLE_METRICS[bubbleMetric];
   const { min: bMin, max: bMax } = bubbleRange;
 
+  const variableKeys = Object.keys(VARIABLES);
+  const variableIdx = variableKeys.indexOf(variable);
+
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div className="relative w-screen h-screen overflow-hidden font-sans">
       <div ref={mapContainer} className="w-full h-full" />
 
-      {/* Controls panel */}
-      <div className="absolute top-4 left-4 z-50 bg-white rounded-xl shadow-lg p-4 w-64 text-sm max-h-[calc(100vh-2rem)] overflow-y-auto">
-        <div className="mb-3">
-          <h1 className="font-bold text-gray-900 text-base leading-tight">European Climate & Living Costs</h1>
-          <p className="text-xs text-gray-400 mt-0.5">Interactive BI Dashboard</p>
-        </div>
+      {/* === Filter Board ============================================== */}
+      <div className="absolute top-5 left-5 z-50 w-[300px]">
+        <div className="relative bg-white/85 backdrop-blur-xl rounded-2xl ring-1 ring-slate-900/[0.06] shadow-[0_8px_32px_rgba(15,23,42,0.10)] overflow-hidden">
+          {/* Hairline amber accent at the very top — sets the visual identity */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/70 to-transparent" />
 
-        <div className="space-y-1 pt-3 border-t border-gray-100">
-          <div className="flex justify-between text-gray-600">
-            <span>Month</span>
-            <span className="font-medium text-gray-900">
-              {MONTH_NAMES[month]}
-              {loading && (
-                <span className="inline-block ml-1.5 w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin align-middle" />
-              )}
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={11}
-            value={month}
-            onChange={handleMonthChange}
-            disabled={loading}
-            className={`w-full accent-blue-600 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          />
-        </div>
+          <div className="p-5 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
 
-        <div className="space-y-1.5 pt-3 mt-3 border-t border-gray-100">
-          <span className="text-gray-600">Heatmap Variable</span>
-          <div className="flex gap-1">
-            {Object.entries(VARIABLES).map(([key, { label: lbl }]) => (
-              <button
-                key={key}
-                onClick={() => setVariable(key)}
-                className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  variable === key
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {lbl}
-              </button>
-            ))}
-          </div>
-          <div className="space-y-1 mt-1">
-            <div
-              className="w-full h-2.5 rounded-full"
-              style={{ background: stopsToGradient(STOP_MAP[variable]) }}
-            />
-            <div className="flex justify-between text-[10px] text-gray-500">
-              <span>{VARIABLES[variable].fixedMin} {unit}</span>
-              <span>{VARIABLES[variable].fixedMax} {unit}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-1.5 pt-3 mt-3 border-t border-gray-100">
-          <span className="text-gray-600">City Bubbles</span>
-          <select
-            value={bubbleMetric}
-            onChange={(e) => setBubbleMetric(e.target.value)}
-            className="w-full px-2 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 border-0 focus:ring-2 focus:ring-blue-500"
-          >
-            {Object.entries(BUBBLE_METRICS).map(([key, { label: lbl }]) => (
-              <option key={key} value={key}>{lbl}</option>
-            ))}
-          </select>
-          {cities && (
-            <div className="space-y-1 mt-1">
-              <div
-                className="w-full h-2.5 rounded-full"
-                style={{
-                  background: currentBubbleMetric.invert
-                    ? stopsToGradient([...GREEN_RED_STOPS].reverse().map((s, i, arr) => ({ ...s, at: i / (arr.length - 1) })))
-                    : stopsToGradient(GREEN_RED_STOPS),
-                }}
-              />
-              <div className="flex justify-between text-[10px] text-gray-500">
-                <span>{formatMetric(bMin, currentBubbleMetric)}</span>
-                <span>{formatMetric(bMax, currentBubbleMetric)}</span>
+            {/* ── Header ─────────────────────────────────────────────── */}
+            <div className="mb-5">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-1.5">
+                Climate Observatory
+              </p>
+              <h1 className="font-serif italic text-[24px] leading-[1.05] text-slate-900">
+                European Climate<br />
+                <span className="text-slate-500">&amp; Living Costs</span>
+              </h1>
+              <div className="mt-2.5 flex items-center gap-2">
+                <span className="h-px w-6 bg-slate-900/30" />
+                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+                  Interactive BI Dashboard
+                </p>
               </div>
             </div>
-          )}
-        </div>
 
-        {error && (
-          <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-red-600 bg-red-50 rounded p-2">
-            {error}
+            {/* ── Month ──────────────────────────────────────────────── */}
+            <div className="pt-4 border-t border-slate-900/10">
+              <div className="flex items-baseline justify-between mb-1.5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400">
+                  Month
+                </p>
+                <button
+                  onClick={handlePlayClick}
+                  disabled={loading}
+                  className="group flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500 hover:text-amber-600 transition-colors disabled:opacity-40"
+                >
+                  <span className="text-[8px] leading-none transition-transform group-hover:translate-x-0.5">▶</span>
+                  Play
+                </button>
+              </div>
+
+              <div className="flex items-baseline justify-between">
+                <h2 className="font-serif italic text-[30px] leading-none text-slate-900 tabular-nums">
+                  {MONTH_NAMES[month]}
+                </h2>
+                {loading && (
+                  <span className="inline-block w-3 h-3 border border-slate-900 border-t-transparent rounded-full animate-spin" />
+                )}
+              </div>
+
+              {/* Custom slider: invisible native input overlaid on decorated track */}
+              <div className="relative h-6 mt-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={11}
+                  value={month}
+                  onChange={handleMonthChange}
+                  disabled={loading}
+                  className={`absolute inset-0 w-full h-full opacity-0 z-20 ${loading ? "cursor-not-allowed" : "cursor-pointer"}`}
+                />
+                {/* base rail */}
+                <div className="absolute top-1/2 left-1 right-1 h-px bg-slate-300 -translate-y-1/2" />
+                {/* filled progress */}
+                <div
+                  className="absolute top-1/2 left-1 h-px bg-slate-900 -translate-y-1/2 transition-[width]"
+                  style={{ width: `calc(${(month / 11) * 100}% - ${(month / 11) * 0.5}rem)` }}
+                />
+                {/* tick marks */}
+                <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 flex justify-between">
+                  {MONTH_NAMES.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-px h-2 transition-colors ${
+                        i === month ? "bg-amber-500" : i < month ? "bg-slate-700" : "bg-slate-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                {/* thumb */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-white border-[1.5px] border-slate-900 rounded-full shadow-sm transition-[left] duration-150 pointer-events-none"
+                  style={{ left: `calc(0.25rem + ${(month / 11) * 100}% - ${(month / 11) * 0.5}rem)` }}
+                />
+              </div>
+              <div className="mt-1.5 flex justify-between font-mono text-[8px] uppercase tracking-[0.18em] text-slate-400">
+                <span>Jan</span>
+                <span>Jul</span>
+                <span>Dec</span>
+              </div>
+            </div>
+
+            {/* ── Heatmap Variable ───────────────────────────────────── */}
+            <div className="pt-4 mt-4 border-t border-slate-900/10">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+                Heatmap Variable
+              </p>
+              {/* Segmented control with sliding indicator */}
+              <div className="relative grid grid-cols-3 bg-slate-100 rounded-lg p-0.5">
+                <div
+                  className="absolute top-0.5 bottom-0.5 left-0.5 bg-slate-900 rounded-md shadow-sm transition-transform duration-300 ease-out"
+                  style={{
+                    width: `calc((100% - 0.25rem) / 3)`,
+                    transform: `translateX(${variableIdx * 100}%)`,
+                  }}
+                />
+                {variableKeys.map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setVariable(key)}
+                    className={`relative z-10 py-1.5 text-[11px] font-medium transition-colors ${
+                      variable === key ? "text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {VARIABLES[key].label}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3">
+                <div
+                  className="w-full h-1.5 rounded-full ring-1 ring-slate-900/[0.04]"
+                  style={{ background: stopsToGradient(STOP_MAP[variable]) }}
+                />
+                <div className="flex justify-between mt-1.5 font-mono text-[9px] tabular-nums text-slate-500">
+                  <span>{VARIABLES[variable].fixedMin} {unit}</span>
+                  <span>{VARIABLES[variable].fixedMax} {unit}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ── City Bubbles ───────────────────────────────────────── */}
+            <div className="pt-4 mt-4 border-t border-slate-900/10">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+                City Bubbles
+              </p>
+              <div className="relative">
+                <select
+                  value={bubbleMetric}
+                  onChange={(e) => setBubbleMetric(e.target.value)}
+                  className="w-full appearance-none px-3 py-2 pr-9 rounded-lg text-[12px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-900 border-0 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer transition-colors"
+                >
+                  {Object.entries(BUBBLE_METRICS).map(([key, { label: lbl }]) => (
+                    <option key={key} value={key}>{lbl}</option>
+                  ))}
+                </select>
+                <svg
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none"
+                  viewBox="0 0 12 12" fill="none"
+                >
+                  <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              {cities && (
+                <div className="mt-3">
+                  <div
+                    className="w-full h-1.5 rounded-full ring-1 ring-slate-900/[0.04]"
+                    style={{
+                      background: currentBubbleMetric.invert
+                        ? stopsToGradient([...GREEN_RED_STOPS].reverse().map((s, i, arr) => ({ ...s, at: i / (arr.length - 1) })))
+                        : stopsToGradient(GREEN_RED_STOPS),
+                    }}
+                  />
+                  <div className="flex justify-between mt-1.5 font-mono text-[9px] tabular-nums text-slate-500">
+                    <span>{formatMetric(bMin, currentBubbleMetric)}</span>
+                    <span>{formatMetric(bMax, currentBubbleMetric)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="mt-4 pt-4 border-t border-slate-900/10">
+                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-rose-700 bg-rose-50/80 ring-1 ring-rose-200/60 rounded-md px-2.5 py-2">
+                  {error}
+                </div>
+              </div>
+            )}
+
+            {!selectedCity && (
+              <div className="pt-4 mt-4 border-t border-slate-900/10 flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
+                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+                  Click a city bubble for details
+                </p>
+              </div>
+            )}
           </div>
-        )}
-
-        {!selectedCity && (
-          <p className="text-xs text-gray-400 italic pt-3 mt-3 border-t border-gray-100">
-            Click a city bubble for details
-          </p>
-        )}
+        </div>
       </div>
 
-      {/* Hover tooltip */}
+      {/* === Hover tooltip ============================================ */}
       {hoverInfo && (
         <div
-          className="absolute pointer-events-none bg-white rounded-lg shadow-lg px-3 py-2 text-xs leading-relaxed z-40"
-          style={{ left: hoverInfo.x + 12, top: hoverInfo.y + 12 }}
+          className="absolute pointer-events-none bg-white/95 backdrop-blur-md rounded-lg ring-1 ring-slate-900/10 shadow-[0_4px_20px_rgba(15,23,42,0.12)] px-3 py-2 text-xs leading-relaxed z-40"
+          style={{ left: hoverInfo.x + 14, top: hoverInfo.y + 14 }}
         >
           {hoverInfo.type === "city" ? (
             <>
-              <div className="font-semibold text-gray-800">{hoverInfo.city}</div>
-              <div className="text-gray-500">{hoverInfo.country?.trim()}</div>
-              <div className="text-gray-600 mt-1">
-                {hoverInfo.metricLabel}: <span className="font-medium text-gray-900">{hoverInfo.metricFormatted}</span>
+              <div className="font-serif italic text-[15px] text-slate-900 leading-tight">{hoverInfo.city}</div>
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 mt-0.5">
+                {hoverInfo.country?.trim()}
+              </div>
+              <div className="mt-2 pt-2 border-t border-slate-900/[0.08] flex items-baseline justify-between gap-4">
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500">
+                  {hoverInfo.metricLabel}
+                </span>
+                <span className="font-mono text-[11px] tabular-nums font-medium text-slate-900">
+                  {hoverInfo.metricFormatted}
+                </span>
               </div>
             </>
           ) : (
             <>
-              <div className="font-medium text-gray-700 mb-1">
-                {hoverInfo.lat.toFixed(2)}°N, {hoverInfo.lon.toFixed(2)}°E
+              <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500 tabular-nums">
+                {hoverInfo.lat.toFixed(2)}°N · {hoverInfo.lon.toFixed(2)}°E
               </div>
-              <div className="text-gray-600">
-                Temperature: <span className="font-medium text-gray-900">
-                  {hoverInfo.temp != null ? `${hoverInfo.temp.toFixed(1)}°C` : "N/A"}
-                </span>
-              </div>
-              <div className="text-gray-600">
-                Precipitation: <span className="font-medium text-gray-900">
-                  {hoverInfo.precip != null ? `${hoverInfo.precip.toFixed(1)} mm` : "N/A"}
-                </span>
-              </div>
-              <div className="text-gray-600">
-                Sunshine: <span className="font-medium text-gray-900">
-                  {hoverInfo.sun != null ? `${hoverInfo.sun.toFixed(1)} h/day` : "N/A"}
-                </span>
+              <div className="mt-1.5 space-y-0.5">
+                <div className="flex justify-between gap-4 font-mono text-[10px] tabular-nums">
+                  <span className="text-slate-500">Temperature</span>
+                  <span className="text-slate-900 font-medium">
+                    {hoverInfo.temp != null ? `${hoverInfo.temp.toFixed(1)} °C` : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4 font-mono text-[10px] tabular-nums">
+                  <span className="text-slate-500">Precipitation</span>
+                  <span className="text-slate-900 font-medium">
+                    {hoverInfo.precip != null ? `${hoverInfo.precip.toFixed(1)} mm` : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4 font-mono text-[10px] tabular-nums">
+                  <span className="text-slate-500">Sunshine</span>
+                  <span className="text-slate-900 font-medium">
+                    {hoverInfo.sun != null ? `${hoverInfo.sun.toFixed(1)} h/day` : "—"}
+                  </span>
+                </div>
               </div>
             </>
           )}
