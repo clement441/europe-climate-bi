@@ -18,6 +18,12 @@ const instrumentSerif = Instrument_Serif({
   style: ["normal", "italic"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata = {
   title: "European Climate & Living Costs Dashboard",
   description: 'Interactive map of European climate data, cost of living, and climate change projections for 230+ cities',

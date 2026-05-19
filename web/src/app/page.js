@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MapboxOverlay } from "@deck.gl/mapbox";
@@ -13,9 +13,12 @@ import {
   stopsToGradient,
 } from "../lib/colorScales";
 import CityDetailPanel from "../components/CityDetailPanel";
+import CitySearch from "../components/CitySearch";
+import { countryToISO } from "../lib/countryFlags";
 
-// Cells slightly smaller than 0.25° grid spacing so borders/coastlines show through gaps
-const CELL_SIZE = 0.21;
+// Cells match the 0.25° grid step exactly — eliminates visible seams between cells.
+// Opacity is reduced slightly in colorScales.getColor to compensate for the larger fill area.
+const CELL_SIZE = 0.25;
 const HALF = CELL_SIZE / 2;
 
 const MONTH_NAMES = [
@@ -26,6 +29,8 @@ const MONTH_KEYS = [
   "jan", "feb", "mar", "apr", "may", "jun",
   "jul", "aug", "sep", "oct", "nov", "dec",
 ];
+
+const VARIABLE_SHORT = { temperature: "Temp", precipitation: "Rain", sunshine: "Sun" };
 
 // Fixed color scale ranges per variable — these stay constant across all months so the user
 // can visually compare across months (e.g. January looks blue, July looks red). Dynamic
@@ -97,20 +102,17 @@ export default function Home() {
 
   const [hoverInfo, setHoverInfo] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [compareCities, setCompareCities] = useState([]);
+  const [addingCompareSlot, setAddingCompareSlot] = useState(false);
+  const [filterExpanded, setFilterExpanded] = useState(false);
   const [borders, setBorders] = useState(null);
-  // bubbleRange is state (not a ref) so the city-layer effect re-runs when it changes,
-  // guaranteeing the layer is rebuilt with the correct color range on first paint.
-  const [bubbleRange, setBubbleRange] = useState({ min: 0, max: 1 });
-  const cache = useRef({});
-
-  useEffect(() => {
-    if (!cities) return;
+  const bubbleRange = useMemo(() => {
+    if (!cities) return { min: 0, max: 1 };
     const metric = BUBBLE_METRICS[bubbleMetric];
     const vals = cities.map(metric.getValue).filter((v) => v != null);
-    if (vals.length) {
-      setBubbleRange({ min: Math.min(...vals), max: Math.max(...vals) });
-    }
+    return vals.length ? { min: Math.min(...vals), max: Math.max(...vals) } : { min: 0, max: 1 };
   }, [cities, bubbleMetric]);
+  const cache = useRef({});
 
   const fetchMonth = useCallback((monthIdx) => {
     const key = MONTH_KEYS[monthIdx];
@@ -321,7 +323,10 @@ export default function Home() {
       },
       pickable: true,
       onClick: (info) => {
-        if (info.object) setSelectedCity(info.object);
+        if (info.object) {
+          setSelectedCity(info.object);
+          setFilterExpanded(false);
+        }
       },
       onHover: (info) => {
         if (info.object) {
@@ -350,6 +355,29 @@ export default function Home() {
     fetchMonth(idx);
   };
 
+  const handleToggleCompare = useCallback((city) => {
+    setCompareCities((prev) => {
+      const already = prev.find((c) => c.city === city.city);
+      if (already) return prev.filter((c) => c.city !== city.city);
+      if (prev.length >= 2) return prev;
+      return [...prev, city];
+    });
+  }, []);
+
+  const handleCitySelect = useCallback((city) => {
+    if (!city) return;
+    setSelectedCity(city);
+    setFilterExpanded(false);
+    if (mapRef.current && city.lat != null && city.lon != null) {
+      mapRef.current.flyTo({
+        center: [city.lon, city.lat],
+        zoom: 6,
+        duration: 1200,
+        essential: true,
+      });
+    }
+  }, []);
+
   // Placeholder for the month auto-cycle feature (Phase 3).
   const handlePlayClick = () => {};
 
@@ -364,13 +392,53 @@ export default function Home() {
     <div className="relative w-screen h-screen overflow-hidden font-sans">
       <div ref={mapContainer} className="w-full h-full" />
 
+      {/* === Mobile backdrops ========================================= */}
+      {filterExpanded && (
+        <div
+          className="sm:hidden fixed inset-0 z-[35] bg-slate-900/10"
+          onClick={() => setFilterExpanded(false)}
+        />
+      )}
+      {selectedCity && (
+        <div
+          className="sm:hidden fixed inset-0 z-[55] bg-slate-900/20"
+          onClick={() => setSelectedCity(null)}
+        />
+      )}
+
       {/* === Filter Board ============================================== */}
-      <div className="absolute top-5 left-5 z-50 w-[300px]">
-        <div className="relative bg-white/85 backdrop-blur-xl rounded-2xl ring-1 ring-slate-900/[0.06] shadow-[0_8px_32px_rgba(15,23,42,0.10)] overflow-hidden">
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-[40] h-[84vh] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${filterExpanded ? "translate-y-0" : "translate-y-[calc(100%-72px)]"} sm:absolute sm:bottom-auto sm:top-5 sm:left-5 sm:right-auto sm:w-[300px] sm:h-auto sm:translate-y-0 sm:transition-none bg-white/92 sm:bg-white/85 backdrop-blur-xl rounded-t-2xl sm:rounded-2xl ring-1 ring-slate-900/[0.06] shadow-[0_-8px_32px_rgba(15,23,42,0.08)] sm:shadow-[0_8px_32px_rgba(15,23,42,0.10)] overflow-hidden`}
+      >
           {/* Hairline amber accent at the very top — sets the visual identity */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/70 to-transparent" />
 
-          <div className="p-5 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
+          {/* Mobile drag handle + tap-to-expand collapsed header */}
+          <button
+            className="sm:hidden w-full flex flex-col items-center pt-2.5"
+            onClick={() => setFilterExpanded((v) => !v)}
+            aria-expanded={filterExpanded ? "true" : "false"}
+            aria-label={filterExpanded ? "Collapse controls" : "Expand map controls"}
+          >
+            <div className="w-9 h-1 rounded-full bg-slate-300 mb-2.5" />
+            <div className="w-full flex items-center justify-between px-5 pb-3.5 border-b border-slate-900/10">
+              <span className="font-serif italic text-[18px] text-slate-900">Controls</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-600/90">
+                  {MONTH_NAMES[month].slice(0, 3)} · {VARIABLE_SHORT[variable]}
+                </span>
+                <svg
+                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300${filterExpanded ? " rotate-180" : ""}`}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                >
+                  <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          <div className="p-5 overflow-y-auto max-h-[calc(84vh-72px)] sm:max-h-[calc(100vh-2.5rem)]">
 
             {/* ── Header ─────────────────────────────────────────────── */}
             <div className="mb-5">
@@ -389,8 +457,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Month ──────────────────────────────────────────────── */}
+            {/* ── Search ─────────────────────────────────────────────── */}
             <div className="pt-4 border-t border-slate-900/10">
+              <CitySearch cities={cities} onSelect={handleCitySelect} />
+            </div>
+
+            {/* ── Month ──────────────────────────────────────────────── */}
+            <div className="pt-4 mt-4 border-t border-slate-900/10">
               <div className="flex items-baseline justify-between mb-1.5">
                 <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400">
                   Month
@@ -542,6 +615,96 @@ export default function Home() {
               </div>
             )}
 
+            {/* ── Compare tray (always visible) ──────────────────────── */}
+            <div className="pt-4 mt-4 border-t border-slate-900/10">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+                Comparing
+              </p>
+              <div className="space-y-1.5">
+                {[0, 1].map((slotIdx) => {
+                  const city = compareCities[slotIdx];
+                  if (city) {
+                    const iso = countryToISO(city.country?.trim());
+                    return (
+                      <div
+                        key={`pinned-${city.city}`}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full ring-1 ring-slate-900/15 bg-white/60 min-w-0"
+                      >
+                        {iso && (
+                          <img
+                            src={`https://flagcdn.com/w20/${iso}.webp`}
+                            alt=""
+                            className="h-3 w-auto rounded-[1px] flex-shrink-0 ring-1 ring-slate-900/[0.04]"
+                            onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          />
+                        )}
+                        <span className="font-serif italic text-[13px] text-slate-900 flex-1 truncate leading-tight">
+                          {city.city}
+                        </span>
+                        <button
+                          onClick={() => handleToggleCompare(city)}
+                          aria-label={`Remove ${city.city} from comparison`}
+                          className="text-[9px] text-slate-400 hover:text-slate-900 transition-colors leading-none flex-shrink-0"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    );
+                  }
+                  // Only render the next empty slot, not any beyond it
+                  if (slotIdx > compareCities.length) return null;
+                  const isActiveSlot = slotIdx === compareCities.length;
+                  if (isActiveSlot && addingCompareSlot) {
+                    return (
+                      <div
+                        key={`search-${slotIdx}`}
+                        onBlur={(e) => {
+                          // Collapse only if focus left the entire search container
+                          if (!e.currentTarget.contains(e.relatedTarget)) {
+                            setTimeout(() => setAddingCompareSlot(false), 120);
+                          }
+                        }}
+                      >
+                        <CitySearch
+                          cities={cities}
+                          hideLabel
+                          autoFocus
+                          placeholder="Add city to compare…"
+                          excludeCities={compareCities}
+                          onSelect={(city) => {
+                            handleToggleCompare(city);
+                            setAddingCompareSlot(false);
+                          }}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <button
+                      key={`add-${slotIdx}`}
+                      onClick={() => setAddingCompareSlot(true)}
+                      disabled={!isActiveSlot}
+                      className={`w-full px-2.5 py-1.5 rounded-full border border-dashed text-[10px] font-mono uppercase tracking-[0.22em] transition-colors ${
+                        isActiveSlot
+                          ? "border-slate-300 text-slate-400 hover:border-amber-500/60 hover:text-amber-600 cursor-pointer"
+                          : "border-slate-200 text-slate-300 cursor-default"
+                      }`}
+                    >
+                      + Add a city
+                    </button>
+                  );
+                })}
+              </div>
+              {compareCities.length === 2 && (
+                <button
+                  onClick={() => setSelectedCity(compareCities[0])}
+                  className="mt-2.5 w-full font-mono text-[9px] uppercase tracking-[0.22em] text-slate-600 hover:text-amber-600 transition-colors py-1.5 text-center"
+                >
+                  View comparison →
+                </button>
+              )}
+            </div>
+
             {!selectedCity && (
               <div className="pt-4 mt-4 border-t border-slate-900/10 flex items-center gap-2">
                 <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
@@ -551,7 +714,6 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div>
       </div>
 
       {/* === Hover tooltip ============================================ */}
@@ -605,7 +767,15 @@ export default function Home() {
         </div>
       )}
 
-      <CityDetailPanel city={selectedCity} onClose={() => setSelectedCity(null)} />
+      <CityDetailPanel
+        city={selectedCity}
+        onClose={() => setSelectedCity(null)}
+        compareCities={compareCities}
+        onToggleCompare={handleToggleCompare}
+        onCitySelect={(city) => { setSelectedCity(city); handleCitySelect(city); }}
+        climateData={climateData}
+        month={month}
+      />
     </div>
   );
 }

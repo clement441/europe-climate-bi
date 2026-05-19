@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { countryToISO } from "../lib/countryFlags";
+import { nearestIdx } from "../lib/gridUtils";
+import ComparePanel from "./ComparePanel";
 
 /* ─── Formatters ─────────────────────────────────────────────────── */
 function fmtPrice(v) { return v != null ? `€${Math.round(v)}` : null; }
@@ -10,28 +13,6 @@ function fmtNum(v, dec = 1) { return v != null ? v.toFixed(dec) : null; }
 function fmtSigned(v, dec, unit) {
   if (v == null) return null;
   return `${v > 0 ? "+" : ""}${v.toFixed(dec)}${unit}`;
-}
-
-/* ─── Country → flag emoji (Europe subset) ───────────────────────── */
-const COUNTRY_FLAG = {
-  "Albania": "🇦🇱", "Andorra": "🇦🇩", "Austria": "🇦🇹", "Belarus": "🇧🇾",
-  "Belgium": "🇧🇪", "Bosnia and Herzegovina": "🇧🇦", "Bulgaria": "🇧🇬",
-  "Croatia": "🇭🇷", "Cyprus": "🇨🇾", "Czech Republic": "🇨🇿", "Czechia": "🇨🇿",
-  "Denmark": "🇩🇰", "Estonia": "🇪🇪", "Finland": "🇫🇮", "France": "🇫🇷",
-  "Germany": "🇩🇪", "Greece": "🇬🇷", "Hungary": "🇭🇺", "Iceland": "🇮🇸",
-  "Ireland": "🇮🇪", "Italy": "🇮🇹", "Kosovo": "🇽🇰", "Latvia": "🇱🇻",
-  "Liechtenstein": "🇱🇮", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺",
-  "Malta": "🇲🇹", "Moldova": "🇲🇩", "Monaco": "🇲🇨", "Montenegro": "🇲🇪",
-  "Netherlands": "🇳🇱", "North Macedonia": "🇲🇰", "Macedonia": "🇲🇰",
-  "Norway": "🇳🇴", "Poland": "🇵🇱", "Portugal": "🇵🇹", "Romania": "🇷🇴",
-  "Russia": "🇷🇺", "San Marino": "🇸🇲", "Serbia": "🇷🇸", "Slovakia": "🇸🇰",
-  "Slovenia": "🇸🇮", "Spain": "🇪🇸", "Sweden": "🇸🇪", "Switzerland": "🇨🇭",
-  "Turkey": "🇹🇷", "Türkiye": "🇹🇷", "Ukraine": "🇺🇦",
-  "United Kingdom": "🇬🇧", "UK": "🇬🇧",
-};
-function countryToFlag(name) {
-  if (!name) return "";
-  return COUNTRY_FLAG[name.trim()] || "";
 }
 
 /* ─── Risk tier visual mapping ───────────────────────────────────── */
@@ -69,13 +50,19 @@ function SectionLabel({ children }) {
   );
 }
 
-/* ─── Sparkline (placeholder seasonal arc) ───────────────────────── */
-function Sparkline({ data }) {
-  // Wire real monthly temperature for this city's nearest climate grid cell
-  // once we have a city → grid-index mapping. For now we render a
-  // canonical mid-latitude seasonal curve so the visual is in place.
-  const points = data && data.length === 12 ? data : [3, 4, 7, 11, 16, 21, 24, 23, 19, 13, 7, 4];
+const MONTH_INITIALS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+/* ─── Sparkline ───────────────────────────────────────────────────── */
+function Sparkline({ data, loading }) {
   const w = 280, h = 56, pad = 6;
+  if (loading || !data) {
+    return (
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12">
+        <line x1={pad} y1={h / 2} x2={w - pad} y2={h / 2} stroke="#e2e8f0" strokeWidth="1.4" strokeDasharray="4 3" />
+      </svg>
+    );
+  }
+  const points = data;
   const min = Math.min(...points), max = Math.max(...points);
   const range = max - min || 1;
   const xs = points.map((_, i) => pad + (i / (points.length - 1)) * (w - 2 * pad));
@@ -84,17 +71,24 @@ function Sparkline({ data }) {
   const area = `${path} L ${xs[xs.length - 1]} ${h - pad} L ${xs[0]} ${h - pad} Z`;
   const peakIdx = points.indexOf(max);
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12">
-      <defs>
-        <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.28" />
-          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill="url(#spark-fill)" />
-      <path d={path} fill="none" stroke="#f59e0b" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={xs[peakIdx]} cy={ys[peakIdx]} r="2.4" fill="#fff" stroke="#f59e0b" strokeWidth="1.4" />
-    </svg>
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12">
+        <defs>
+          <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#spark-fill)" />
+        <path d={path} fill="none" stroke="#f59e0b" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={xs[peakIdx]} cy={ys[peakIdx]} r="2.4" fill="#fff" stroke="#f59e0b" strokeWidth="1.4" />
+      </svg>
+      <div className="flex justify-between mt-0.5">
+        {MONTH_INITIALS.map((m, i) => (
+          <span key={i} className="font-mono text-[8px] text-slate-300 w-[1ch] text-center">{m}</span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -133,6 +127,26 @@ function RingGauge({ score, color }) {
   );
 }
 
+/* ─── Climate data cache (module-level, persists for the session) ─── */
+const climateCache = {};
+const MONTH_KEYS_ALL = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+
+async function fetchSparklineTemps(lat, lon) {
+  const months = await Promise.all(
+    MONTH_KEYS_ALL.map(async (key) => {
+      if (!climateCache[key]) {
+        const res = await fetch(`/data/climate_normals/climate_${key}.json`);
+        climateCache[key] = await res.json();
+      }
+      return climateCache[key];
+    })
+  );
+  const { lats, lons } = months[0];
+  const latIdx = nearestIdx(lats, lat);
+  const lonIdx = nearestIdx(lons, lon);
+  return months.map((m) => m.temperature[latIdx]?.[lonIdx] ?? null);
+}
+
 /* ─── Tabs definition ────────────────────────────────────────────── */
 const TABS = [
   { key: "climate", label: "Climate" },
@@ -141,30 +155,89 @@ const TABS = [
 ];
 
 /* ─── Component ──────────────────────────────────────────────────── */
-export default function CityDetailPanel({ city, onClose }) {
+export default function CityDetailPanel({ city, onClose, compareCities = [], onToggleCompare, onCitySelect, climateData, month }) {
   const [tab, setTab] = useState("climate");
+  const [sparklineTemps, setSparklineTemps] = useState(null);
+  const [sparklineLoading, setSparklineLoading] = useState(false);
+
+  useEffect(() => {
+    if (!city?.lat || !city?.lon) return;
+    setSparklineTemps(null);
+    setSparklineLoading(true);
+    fetchSparklineTemps(city.lat, city.lon)
+      .then(setSparklineTemps)
+      .catch(() => setSparklineTemps(null))
+      .finally(() => setSparklineLoading(false));
+  }, [city?.lat, city?.lon]);
+
   if (!city) return null;
 
   const risk = RISK[city.risk_tier] || RISK_DEFAULT;
-  const flag = countryToFlag(city.country?.trim());
+  const iso = countryToISO(city.country?.trim());
+  const isPinned = compareCities.some((c) => c.city === city.city);
+  const showCompare = compareCities.length === 2;
 
   return (
-    <aside className="absolute top-0 right-0 z-50 w-full sm:w-[380px] h-full bg-white/92 backdrop-blur-xl shadow-[0_0_60px_rgba(15,23,42,0.15)] border-l border-slate-900/10 overflow-hidden flex flex-col font-sans">
+    <aside className="fixed bottom-0 left-0 right-0 z-[60] h-[72%] rounded-t-2xl border-t border-slate-900/10 shadow-[0_-8px_48px_rgba(15,23,42,0.12)] city-panel-slide-in sm:absolute sm:top-0 sm:right-0 sm:left-auto sm:bottom-auto sm:w-[380px] sm:h-full sm:rounded-none sm:border-t-0 sm:border-l sm:shadow-[0_0_60px_rgba(15,23,42,0.15)] sm:[animation:none] bg-white/92 backdrop-blur-xl overflow-hidden flex flex-col font-sans">
       {/* Hairline amber accent — mirrors the filter board */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/70 to-transparent z-10" />
 
+      {/* Mobile: drag handle + compare/close buttons inline (hidden on desktop) */}
+      <div className="sm:hidden flex-shrink-0 flex items-center justify-between px-4 pt-3 pb-2">
+        <button
+          onClick={() => onToggleCompare?.(city)}
+          aria-label={isPinned ? "Remove from comparison" : "Add to comparison"}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] transition-all ${
+            isPinned
+              ? "bg-amber-500 text-white shadow-sm"
+              : "ring-1 ring-slate-900/20 text-slate-500 hover:ring-amber-500/60 hover:text-amber-600"
+          }`}
+        >
+          {isPinned ? "Pinned ✓" : "+ Compare"}
+        </button>
+        <div className="absolute left-1/2 -translate-x-1/2 w-9 h-1 rounded-full bg-slate-300" />
+        <button
+          onClick={onClose}
+          aria-label="Close panel"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors text-base"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Desktop: compare toggle (absolute, hidden on mobile) */}
+      <button
+        onClick={() => onToggleCompare?.(city)}
+        aria-label={isPinned ? "Remove from comparison" : "Add to comparison"}
+        className={`hidden sm:flex absolute top-4 right-14 z-20 items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] transition-all ${
+          isPinned
+            ? "bg-amber-500 text-white shadow-sm"
+            : "ring-1 ring-slate-900/20 text-slate-500 hover:ring-amber-500/60 hover:text-amber-600"
+        }`}
+      >
+        {isPinned ? "Pinned ✓" : "+ Compare"}
+      </button>
+
+      {/* Desktop: close button (absolute, hidden on mobile) */}
       <button
         onClick={onClose}
         aria-label="Close panel"
-        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors z-20 text-base"
+        className="hidden sm:flex absolute top-4 right-4 w-8 h-8 items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors z-20 text-base"
       >
         ✕
       </button>
 
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="px-6 pt-6 pb-5 border-b border-slate-900/10">
+      <div className="px-6 pt-4 sm:pt-6 pb-5 border-b border-slate-900/10">
         <div className="flex items-center gap-2 mb-2">
-          {flag && <span className="text-base leading-none">{flag}</span>}
+          {iso && (
+            <img
+              src={`https://flagcdn.com/w40/${iso}.webp`}
+              alt={city.country}
+              className="h-3.5 w-auto rounded-sm object-cover"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+          )}
           <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-500">
             {city.country?.trim()}
           </p>
@@ -180,45 +253,63 @@ export default function CityDetailPanel({ city, onClose }) {
           </div>
         )}
         {city.risk_tier && (
-          <div className={`mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium ring-1 ${risk.bg} ${risk.text} ${risk.ringCls}`}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: risk.ring }} />
-            {city.risk_tier}
+          <div className="mt-3 flex items-center gap-2">
+            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-400">
+              Climate Risk
+            </p>
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium ring-1 ${risk.bg} ${risk.text} ${risk.ringCls}`}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: risk.ring }} />
+              {city.risk_tier}
+            </div>
           </div>
         )}
       </div>
 
-      {/* ── Tabs ───────────────────────────────────────────────────── */}
-      <div className="flex border-b border-slate-900/10 bg-white/40">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`relative flex-1 py-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors ${
-              tab === t.key ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
-            }`}
-          >
-            {t.label}
-            <span
-              className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-amber-500 transition-all duration-300 ${
-                tab === t.key ? "w-10 opacity-100" : "w-0 opacity-0"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
+      {showCompare ? (
+        /* ── Compare view ──────────────────────────────────────────── */
+        <ComparePanel
+          cities={compareCities}
+          onRemove={(c) => onToggleCompare?.(c)}
+          onCityClick={(c) => onCitySelect?.(c)}
+          climateData={climateData}
+          month={month}
+        />
+      ) : (
+        <>
+          {/* ── Tabs ─────────────────────────────────────────────────── */}
+          <div className="flex border-b border-slate-900/10 bg-white/40">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`relative flex-1 py-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors ${
+                  tab === t.key ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                {t.label}
+                <span
+                  className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-amber-500 transition-all duration-300 ${
+                    tab === t.key ? "w-10 opacity-100" : "w-0 opacity-0"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
 
-      {/* ── Tab content ────────────────────────────────────────────── */}
-      <div key={tab} className="flex-1 overflow-y-auto px-6 py-5 panel-tab-fade">
-        {tab === "climate" && <ClimateTab city={city} />}
-        {tab === "cost" && <CostTab city={city} />}
-        {tab === "resilience" && <ResilienceTab city={city} risk={risk} />}
-      </div>
+          {/* ── Tab content ──────────────────────────────────────────── */}
+          <div key={tab} className="flex-1 overflow-y-auto px-6 py-5 panel-tab-fade">
+            {tab === "climate" && <ClimateTab city={city} sparklineTemps={sparklineTemps} sparklineLoading={sparklineLoading} />}
+            {tab === "cost" && <CostTab city={city} />}
+            {tab === "resilience" && <ResilienceTab city={city} risk={risk} />}
+          </div>
+        </>
+      )}
     </aside>
   );
 }
 
 /* ─── Climate tab ────────────────────────────────────────────────── */
-function ClimateTab({ city }) {
+function ClimateTab({ city, sparklineTemps, sparklineLoading }) {
   const baseT = fmtTemp(city.baseline_temp_c);
   const futT = fmtTemp(city.future_temp_c);
   const dT = city.delta_temp_c;
@@ -250,7 +341,7 @@ function ClimateTab({ city }) {
           <SectionLabel>Annual Cycle (baseline)</SectionLabel>
           <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400">Jan — Dec</p>
         </div>
-        <Sparkline />
+        <Sparkline data={sparklineTemps} loading={sparklineLoading} />
       </div>
 
       {/* Detailed projections */}

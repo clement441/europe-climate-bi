@@ -54,9 +54,9 @@ export function getColor(variable, value, min, max) {
   const range = max - min;
   const ratio = range === 0 ? 0.5 : Math.max(0, Math.min(1, (value - min) / range));
   const [r, g, b] = multiStopColor(ratio, STOP_MAP[variable]);
-  // Alpha 150 (was 179) keeps colors saturated but lets basemap borders/labels
-  // read through more cleanly.
-  return [r, g, b, 150];
+  // Alpha 140: cells are now full 0.25° (no gaps), so a slightly lower opacity
+  // preserves comparable basemap bleed-through.
+  return [r, g, b, 140];
 }
 
 export const GREEN_RED_STOPS = [
