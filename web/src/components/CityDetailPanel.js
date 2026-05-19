@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { countryToISO } from "../lib/countryFlags";
+import { useEffect, useId, useState } from "react";
+import { MONTH_KEYS } from "../lib/constants";
 import { nearestIdx } from "../lib/gridUtils";
+import Flag from "./Flag";
 import ComparePanel from "./ComparePanel";
 
 /* ─── Formatters ─────────────────────────────────────────────────── */
@@ -54,6 +55,8 @@ const MONTH_INITIALS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "
 
 /* ─── Sparkline ───────────────────────────────────────────────────── */
 function Sparkline({ data, loading }) {
+  const uid = useId();
+  const gradientId = `spark-fill-${uid}`;
   const w = 280, h = 56, pad = 6;
   if (loading || !data) {
     return (
@@ -63,7 +66,8 @@ function Sparkline({ data, loading }) {
     );
   }
   const points = data;
-  const min = Math.min(...points), max = Math.max(...points);
+  const min = points.reduce((a, b) => Math.min(a, b));
+  const max = points.reduce((a, b) => Math.max(a, b));
   const range = max - min || 1;
   const xs = points.map((_, i) => pad + (i / (points.length - 1)) * (w - 2 * pad));
   const ys = points.map((p) => h - pad - ((p - min) / range) * (h - 2 * pad));
@@ -74,12 +78,12 @@ function Sparkline({ data, loading }) {
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12">
         <defs>
-          <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.28" />
             <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={area} fill="url(#spark-fill)" />
+        <path d={area} fill={`url(#${gradientId})`} />
         <path d={path} fill="none" stroke="#f59e0b" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
         <circle cx={xs[peakIdx]} cy={ys[peakIdx]} r="2.4" fill="#fff" stroke="#f59e0b" strokeWidth="1.4" />
       </svg>
@@ -129,14 +133,16 @@ function RingGauge({ score, color }) {
 
 /* ─── Climate data cache (module-level, persists for the session) ─── */
 const climateCache = {};
-const MONTH_KEYS_ALL = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
 
 async function fetchSparklineTemps(lat, lon) {
   const months = await Promise.all(
-    MONTH_KEYS_ALL.map(async (key) => {
+    MONTH_KEYS.map((key) => {
       if (!climateCache[key]) {
-        const res = await fetch(`/data/climate_normals/climate_${key}.json`);
-        climateCache[key] = await res.json();
+        climateCache[key] = fetch(`/data/climate_normals/climate_${key}.json`)
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status} loading climate_${key}.json`);
+            return res.json();
+          });
       }
       return climateCache[key];
     })
@@ -173,8 +179,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
   if (!city) return null;
 
   const risk = RISK[city.risk_tier] || RISK_DEFAULT;
-  const iso = countryToISO(city.country?.trim());
-  const isPinned = compareCities.some((c) => c.city === city.city);
+  const isPinned = compareCities.some((c) => c.city === city.city && c.country === city.country);
   const showCompare = compareCities.length === 2;
 
   return (
@@ -230,14 +235,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
       {/* ── Header ─────────────────────────────────────────────────── */}
       <div className="px-6 pt-4 sm:pt-6 pb-5 border-b border-slate-900/10">
         <div className="flex items-center gap-2 mb-2">
-          {iso && (
-            <img
-              src={`https://flagcdn.com/w40/${iso}.webp`}
-              alt={city.country}
-              className="h-3.5 w-auto rounded-sm object-cover"
-              onError={(e) => { e.currentTarget.style.display = "none"; }}
-            />
-          )}
+          <Flag country={city.country} size="w40" alt={city.country} className="h-3.5 w-auto rounded-sm object-cover" />
           <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-500">
             {city.country?.trim()}
           </p>
@@ -358,10 +356,7 @@ function ClimateTab({ city, sparklineTemps, sparklineLoading }) {
         <Stat
           label="Precipitation Δ"
           value={fmtPct(city.delta_precip_pct)}
-          accent={
-            city.delta_precip_pct == null ? null :
-            city.delta_precip_pct >= 0 ? "text-emerald-700" : "text-rose-700"
-          }
+          accent={city.delta_precip_pct == null ? null : "text-amber-700"}
         />
         <Stat
           label="Extreme Heat Days"

@@ -1,13 +1,9 @@
 "use client";
 
+import { MONTH_NAMES } from "../lib/constants";
 import { getColor } from "../lib/colorScales";
-import { countryToISO } from "../lib/countryFlags";
+import Flag from "./Flag";
 import { nearestGridValue } from "../lib/gridUtils";
-
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
 
 const METRICS = [
   {
@@ -99,19 +95,6 @@ function barProps(value, otherValue, invert, showWinner, absoluteColor) {
   return { color: isWinner ? EMERALD_500 : SLATE_300, pct };
 }
 
-function Flag({ country }) {
-  const iso = countryToISO(country?.trim());
-  if (!iso) return null;
-  return (
-    <img
-      src={`https://flagcdn.com/w20/${iso}.webp`}
-      alt=""
-      className="h-3 w-auto rounded-[1px] flex-shrink-0 ring-1 ring-slate-900/[0.04]"
-      onError={(e) => { e.currentTarget.style.display = "none"; }}
-    />
-  );
-}
-
 function MetricSection({ metric, cityA, cityB, climateData }) {
   const va = metric.getValue(cityA, climateData);
   const vb = metric.getValue(cityB, climateData);
@@ -197,8 +180,8 @@ export default function ComparePanel({ cities, onRemove, onCityClick, climateDat
           </div>
         </div>
 
-        {METRICS.map((m, idx) => (
-          <div key={m.label}>
+        {METRICS.map((metric, idx) => (
+          <div key={metric.label}>
             {idx === firstClimateIdx && (
               <div className="mb-4 mt-2 flex items-center gap-2.5">
                 <span className="h-px flex-1 bg-amber-500/25" />
@@ -208,7 +191,7 @@ export default function ComparePanel({ cities, onRemove, onCityClick, climateDat
                 <span className="h-px flex-1 bg-amber-500/25" />
               </div>
             )}
-            <MetricSection metric={m} cityA={cityA} cityB={cityB} climateData={climateData} />
+            <MetricSection metric={metric} cityA={cityA} cityB={cityB} climateData={climateData} />
           </div>
         ))}
       </div>

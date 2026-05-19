@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import { countryToISO } from "../lib/countryFlags";
+import Flag from "./Flag";
 
 const FUSE_OPTIONS = {
   keys: [
@@ -175,7 +175,6 @@ export default function CitySearch({
 }
 
 function ResultRow({ city, active, onHover, onSelect }) {
-  const iso = countryToISO(city.country?.trim());
   return (
     <li>
       <button
@@ -196,14 +195,7 @@ function ResultRow({ city, active, onHover, onSelect }) {
           aria-hidden="true"
         />
 
-        {iso && (
-          <img
-            src={`https://flagcdn.com/w20/${iso}.webp`}
-            alt=""
-            className="h-3 w-auto rounded-[1px] flex-shrink-0 mt-px ring-1 ring-slate-900/[0.04]"
-            onError={(e) => { e.currentTarget.style.display = "none"; }}
-          />
-        )}
+        <Flag country={city.country} className="h-3 w-auto rounded-[1px] flex-shrink-0 mt-px ring-1 ring-slate-900/[0.04]" />
 
         <span className="flex-1 min-w-0 flex items-baseline gap-2 overflow-hidden">
           <span className="font-serif italic text-[14px] leading-tight text-slate-900 truncate">
