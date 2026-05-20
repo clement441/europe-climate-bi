@@ -206,7 +206,7 @@ export default function AboutPage() {
               GitHub
             </a>
             <a
-              href="https://linkedin.com/in/YOUR-LINKEDIN-SLUG"
+              href="https://www.linkedin.com/in/clement-thony"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-1 ring-slate-900/15 bg-white/60 font-mono text-[11px] uppercase tracking-[0.18em] text-slate-600 hover:text-amber-600 hover:ring-amber-500/40 transition-colors"

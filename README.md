@@ -2,7 +2,7 @@
 
 An interactive map dashboard that overlays 30 years of European climate science with city-level cost-of-living data — so you can explore, compare, and make sense of Europe across both dimensions.
 
-**Live demo:** [europe-climate-bi.vercel.app](https://europe-climate-bi.vercel.app) <!-- replace with your actual URL -->
+**Live demo:** [europe-climate-bi.vercel.app](https://europe-climate-bi.vercel.app)
 
 ---
 
