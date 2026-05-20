@@ -40,6 +40,7 @@ next-env.d.ts
 
 # Claude
 .claude/settings.local.json
+CLAUDE.md
 
 # OS
 .DS_Store
