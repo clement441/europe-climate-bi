@@ -361,7 +361,7 @@ export default function Home() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden font-sans">
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="w-full h-full" role="region" aria-label="Interactive climate map of Europe" />
 
       {/* === Mobile backdrops ========================================= */}
       {filterExpanded && (

@@ -275,10 +275,12 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
       ) : (
         <>
           {/* ── Tabs ─────────────────────────────────────────────────── */}
-          <div className="flex border-b border-slate-900/10 bg-white/40">
+          <div role="tablist" className="flex border-b border-slate-900/10 bg-white/40">
             {TABS.map((t) => (
               <button
                 key={t.key}
+                role="tab"
+                aria-selected={tab === t.key}
                 onClick={() => setTab(t.key)}
                 className={`relative flex-1 py-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors ${
                   tab === t.key ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
@@ -295,7 +297,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
           </div>
 
           {/* ── Tab content ──────────────────────────────────────────── */}
-          <div key={tab} className="flex-1 overflow-y-auto px-6 py-5 panel-tab-fade">
+          <div key={tab} role="tabpanel" className="flex-1 overflow-y-auto px-6 py-5 panel-tab-fade">
             {tab === "climate" && <ClimateTab city={city} sparklineTemps={sparklineTemps} sparklineLoading={sparklineLoading} />}
             {tab === "cost" && <CostTab city={city} />}
             {tab === "resilience" && <ResilienceTab city={city} risk={risk} />}

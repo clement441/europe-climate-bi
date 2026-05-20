@@ -125,6 +125,19 @@ Full head-to-head city comparison, accessible from two entry points:
 
 ---
 
+## Next session — TODO ✅
+
+- [x] **Change favicon** — amber map-pin SVG (`web/public/favicon.svg`) wired via `metadata.icons` in `layout.js`.
+- [x] **Pre-close review** — final pass complete:
+  - **OG / Twitter metadata** — `openGraph` + `twitter` blocks added to `layout.js` for social sharing.
+  - **Accessibility** — map container gains `role="region"` + `aria-label`; tab strip gains `role="tablist"` / `role="tab"` / `aria-selected`; tab panel gains `role="tabpanel"`.
+  - **console.error calls** — kept (legitimate fetch error handlers, not debug prints).
+  - Password-protecting the deploy: not needed — public portfolio is the point.
+
+**Project complete.**
+
+---
+
 ## Decisions already made
 
 - **Color scale direction:** RdYlBu reversed (locked in Phase 1).

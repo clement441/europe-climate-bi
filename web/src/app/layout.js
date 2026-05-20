@@ -26,7 +26,22 @@ export const viewport = {
 
 export const metadata = {
   title: "European Climate & Living Costs Dashboard",
-  description: 'Interactive map of European climate data, cost of living, and climate change projections for 230+ cities',
+  description: "Interactive map of European climate data, cost of living, and climate change projections for 230+ cities.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
+  openGraph: {
+    title: "European Climate & Living Costs Dashboard",
+    description: "Interactive map of European climate data, cost of living, and climate change projections for 230+ cities.",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: "European Climate & Living Costs Dashboard",
+    description: "Interactive map of European climate data, cost of living, and climate change projections for 230+ cities.",
+  },
 };
 
 export default function RootLayout({ children }) {
