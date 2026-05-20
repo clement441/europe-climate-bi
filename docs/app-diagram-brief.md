@@ -15,11 +15,13 @@ Create a box labeled "Static JSON Files". Note: cities_all.json (231 cities), bo
 
 Create a box labeled "flagcdn.com CDN". Note: external CDN; serves country flag images as WebP by ISO code.
 
-Create a group labeled "Next.js App — Vercel (static export)" that contains: layout.js, page.js.
+Create a group labeled "Next.js App — Vercel (static export)" that contains: layout.js, page.js, about/page.js.
 
 Create a box labeled "layout.js". Note: HTML shell — sets page title, Open Graph meta tags, loads three Google Fonts (Geist Sans, Geist Mono, Instrument Serif). File: web/src/app/layout.js.
 
-Create a box labeled "page.js". Note: single route "/", owns the entire app — map init, all React state (14 useState/useMemo/useRef entries), all Deck.gl layer assembly, and event handlers. File: web/src/app/page.js.
+Create a box labeled "page.js". Note: route "/", owns the entire app — map init, all React state (14 useState/useMemo/useRef entries), all Deck.gl layer assembly, and event handlers. Cleanup resets mapRef, overlayRef, and layersRef to null. File: web/src/app/page.js.
+
+Create a box labeled "about/page.js". Note: route "/about", static server component — plain-English intro, navigation guide, data-source attribution, author bio. No React state; linked from a floating button on the map and two links in FilterBoard. File: web/src/app/about/page.js.
 
 Create a group labeled "UI Components (React)" that contains: FilterBoard, CityDetailPanel, ComparePanel, CitySearch.
 
@@ -48,6 +50,12 @@ Draw an arrow from Static JSON Files to page.js. Label it "fetch on mount (citie
 Draw an arrow from flagcdn.com CDN to CityDetailPanel. Label it "flag images (via Flag.js, onError silenced)".
 
 Draw an arrow from layout.js to page.js. Label it "wraps in <body> with font CSS variables".
+
+Draw an arrow from layout.js to about/page.js. Label it "wraps in <body> with font CSS variables".
+
+Draw an arrow from page.js to about/page.js. Label it "floating About button + FilterBoard links (Next.js Link)".
+
+Mark about/page.js as entry point.
 
 Draw an arrow from page.js to FilterBoard. Label it "month, variable, bubbleMetric, cities, compareCities — props".
 

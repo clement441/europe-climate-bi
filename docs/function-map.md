@@ -1,6 +1,6 @@
 # Function Map: European Climate & Living Costs BI Dashboard
 
-> Generated: 2026-05-20 | Files scanned: 16 | Functions documented: 50
+> Generated: 2026-05-20 | Files scanned: 17 | Functions documented: 51
 
 ---
 
@@ -9,6 +9,7 @@
 | Module | Primary files | Responsibility |
 |--------|---------------|----------------|
 | App Shell & Map Orchestration | `web/src/app/page.js`, `web/src/app/layout.js` | Root layout, map initialisation, deck.gl layer lifecycle, global state, top-level event handlers |
+| About Page | `web/src/app/about/page.js` | Static user-facing about page: plain-English app intro, navigation guide, data sources, author section |
 | Color Scales & Legend | `web/src/lib/colorScales.js` | Per-variable color interpolation for heatmap cells and city bubbles, gradient CSS generation |
 | Grid Utilities | `web/src/lib/gridUtils.js` | Nearest-neighbour lookup on the 0.25° climate grid |
 | Formatting & Shared Utilities | `web/src/lib/utils.js`, `web/src/lib/constants.js`, `web/src/lib/countryFlags.js` | Metric display formatting, month name/key constants, ISO country-code lookup |
@@ -43,7 +44,7 @@
 ### `Home`
 **File:** `web/src/app/page.js:65`
 **Signature:** `Home() -> JSX`
-**Purpose:** Single-page application root. Initialises the MapLibre map and deck.gl overlay, owns all app state (month, variable, city selection, compare list), and wires layer rebuild effects to state changes.
+**Purpose:** Single-page application root. Initialises the MapLibre map and deck.gl overlay, owns all app state (month, variable, city selection, compare list), and wires layer rebuild effects to state changes. Map init cleanup resets `mapRef`, `overlayRef`, and `layersRef` to null in addition to calling `map.remove()`.
 **Inputs:** none (React component, driven by internal state)
 **Output:** Full-page map with overlaid UI panels.
 **Called by:** `[entry point]`
@@ -107,6 +108,21 @@
 **Output:** void / side-effect (sets `selectedCity` state, calls `map.flyTo`)
 **Called by:** `[entry point]` (passed as `onCitySelect` prop to `FilterBoard` and `CityDetailPanel`)
 **Calls:** `[none]`
+
+---
+
+## About Page
+
+> Static Next.js page at `/about`. No internal named functions — only module-level static data arrays and the default export component.
+
+### `AboutPage`
+**File:** `web/src/app/about/page.js:1`
+**Signature:** `AboutPage() -> JSX`
+**Purpose:** Renders the full-page About section with a plain-English introduction to the app, a numbered "How to use it" steps list, data-source attribution cards, and an author section with link pills. Provides a back-to-map `Link` in both the header and footer.
+**Inputs:** none (static page, no props)
+**Output:** Full-page static JSX document.
+**Called by:** `[entry point]` (Next.js router renders at `/about`)
+**Calls:** `Link`
 
 ---
 
@@ -277,7 +293,7 @@
 - `onToggleExpanded` (function) -- mobile sheet toggle handler
 **Output:** Rendered filter board panel.
 **Called by:** `[entry point]` (rendered by `Home`)
-**Calls:** `renderCompareSlot`, `stopsToGradient`, `formatMetric`, `CitySearch`, `Flag`
+**Calls:** `renderCompareSlot`, `stopsToGradient`, `formatMetric`, `CitySearch`, `Flag`, `Link`
 
 ---
 

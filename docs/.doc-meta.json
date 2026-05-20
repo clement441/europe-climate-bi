@@ -1,16 +1,16 @@
 {
   "app-overview": {
-    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "commit": "c84e51bdd24582d96947718544775436033e5419",
     "doc": "docs/app-overview.md",
     "scope": ["web/src/**", "web/package.json", "CLAUDE.md"]
   },
   "data-pipeline-map": {
-    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "commit": "c84e51bdd24582d96947718544775436033e5419",
     "doc": "docs/data-pipeline-map.md",
     "scope": ["scripts/**", "requirements.txt"]
   },
   "function-map": {
-    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "commit": "c84e51bdd24582d96947718544775436033e5419",
     "doc": "docs/function-map.md",
     "scope": ["web/src/**"]
   }

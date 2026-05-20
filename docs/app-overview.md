@@ -32,6 +32,9 @@ europe-climate-bi/
       app/
         layout.js              -- HTML shell: page title, Open Graph meta, three Google Fonts
         page.js                -- the entire app at "/" -- map init, all state, all layers
+        about/
+          page.js              -- static About page at "/about" -- plain-English intro, how-to,
+                               --   data sources, author section; server component (no "use client")
         globals.css            -- Tailwind import + two keyframe animations (slide-up, tab-fade)
       components/
         FilterBoard.js         -- left-side control panel: month slider, variable/metric selectors,
@@ -76,7 +79,7 @@ europe-climate-bi/
   CLAUDE.md                    -- project instructions for Claude Code
 ```
 
-There is only one route: "/" renders page.js, which contains the entire application.
+Two routes exist: "/" renders page.js (the full map application), and "/about" renders about/page.js (a static server-rendered About page with no interactivity). The About page is linked from three places: a floating info button on the map (desktop only), an amber "About" link in the FilterBoard header, and a footer link at the bottom of the filter panel.
 
 
 ## 4. How the App Works -- the Main Flow
@@ -115,7 +118,7 @@ cities_all  maplibre       borders.geojson
               overlayRef.setProps() -> re-render
 ```
 
-**Map initialization:** page.js creates a MapLibre map pointing to CartoDB Positron tile URL, adds a Deck.gl MapboxOverlay in interleaved mode, and boosts some CartoDB layer paint properties (border width, label opacity) so they stay legible over the colored heatmap.
+**Map initialization and cleanup:** page.js creates a MapLibre map pointing to CartoDB Positron tile URL, adds a Deck.gl MapboxOverlay in interleaved mode, and boosts some CartoDB layer paint properties (border width, label opacity) so they stay legible over the colored heatmap. The cleanup function calls map.remove() and resets mapRef, overlayRef, and layersRef to null so React Strict Mode's double-invoke does not re-use finalized deck.gl layer objects on remount.
 
 **Layer management:** Rather than re-rendering all three layers together, each layer has its own useEffect that rebuilds only when its relevant state changes (climate data + variable for the heatmap; borders data for borders; cities + bubbleMetric for bubbles). After rebuilding, flushLayers() calls overlayRef.setProps() with all three layers in the correct z-order.
 
@@ -210,6 +213,7 @@ Raw ERA5 science data and Numbeo cost CSVs -> Python pipeline -> static JSON fil
 |---|---|
 | web/src/app/page.js | The entire app -- map init, all React state, all Deck.gl layers, event handlers |
 | web/src/app/layout.js | HTML shell -- page metadata, Open Graph tags, Google Font loading |
+| web/src/app/about/page.js | Static About page -- plain-English app intro, navigation guide, data sources, author bio |
 | web/src/components/FilterBoard.js | Left control panel -- month slider, variable/metric selectors, city search, compare tray |
 | web/src/components/CityDetailPanel.js | Right city panel -- Climate/Cost/Resilience tabs, sparkline, ring gauge, compare toggle |
 | web/src/components/ComparePanel.js | City vs city bar chart -- 7 metrics with winner highlighting |
