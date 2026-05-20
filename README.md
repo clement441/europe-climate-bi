@@ -95,6 +95,6 @@ Both pipelines write their final outputs directly into `web/public/data/`.
 
 ## About
 
-Built by [Clément](https://datasaku.com) — data scientist and AI developer. Through [Datasaku](https://datasaku.com) I help agrifood businesses build data pipelines and AI systems, and take on data science, analysis, and AI development projects more broadly.
+Built by [Clément](https://www.datasaku.com/) — data scientist and AI developer. Through [Datasaku](https://www.datasaku.com/) I help agrifood businesses build data pipelines and AI systems, and take on data science, analysis, and AI development projects more broadly.
 
 This dashboard is a portfolio piece demonstrating end-to-end data skills: raw satellite data acquisition, Python processing pipelines, and a polished interactive web application.

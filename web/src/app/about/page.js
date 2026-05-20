@@ -169,7 +169,7 @@ export default function AboutPage() {
           <p className="text-[15px] leading-relaxed text-slate-700 mb-6">
             I&apos;m Clément, a data scientist and AI developer. Through{" "}
             <a
-              href="https://datasaku.com"
+              href="https://www.datasaku.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-slate-900 hover:text-amber-600 transition-colors underline underline-offset-2 decoration-slate-300 hover:decoration-amber-500"
@@ -183,7 +183,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-wrap gap-2.5">
             <a
-              href="https://datasaku.com"
+              href="https://www.datasaku.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ring-1 ring-slate-900/15 bg-white/60 font-mono text-[11px] uppercase tracking-[0.18em] text-slate-600 hover:text-amber-600 hover:ring-amber-500/40 transition-colors"
