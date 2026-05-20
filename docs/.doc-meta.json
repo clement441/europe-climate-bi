@@ -1,0 +1,17 @@
+{
+  "app-overview": {
+    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "doc": "docs/app-overview.md",
+    "scope": ["web/src/**", "web/package.json", "CLAUDE.md"]
+  },
+  "data-pipeline-map": {
+    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "doc": "docs/data-pipeline-map.md",
+    "scope": ["scripts/**", "requirements.txt"]
+  },
+  "function-map": {
+    "commit": "6919ef680bcd81949d910bd478cb77428116dff9",
+    "doc": "docs/function-map.md",
+    "scope": ["web/src/**"]
+  }
+}

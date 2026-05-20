@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MapboxOverlay } from "@deck.gl/mapbox";
@@ -186,7 +187,12 @@ export default function Home() {
 
     mapRef.current = map;
     overlayRef.current = overlay;
-    return () => map.remove();
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      overlayRef.current = null;
+      layersRef.current = { heatmap: null, borders: null, cities: null };
+    };
   }, []);
 
   const flushLayers = useCallback(() => {
@@ -462,6 +468,19 @@ export default function Home() {
         climateData={climateData}
         month={month}
       />
+
+      {/* === Floating About button (desktop only, sits above MapLibre attribution) === */}
+      <Link
+        href="/about"
+        title="About this dashboard"
+        className="hidden sm:flex fixed bottom-10 right-4 z-[30] items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-md ring-1 ring-slate-900/10 shadow-[0_4px_16px_rgba(15,23,42,0.10)] text-slate-500 hover:text-amber-600 hover:ring-amber-500/40 transition-colors"
+      >
+        <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M7 6.5v4M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.22em]">About</span>
+      </Link>
     </div>
   );
 }

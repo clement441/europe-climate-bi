@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { MONTH_NAMES } from "../lib/constants";
 import { formatMetric } from "../lib/utils";
 import { STOP_MAP, GREEN_RED_STOPS, stopsToGradient } from "../lib/colorScales";
@@ -144,11 +145,22 @@ export default function FilterBoard({
             European Climate<br />
             <span className="text-slate-500">&amp; Living Costs</span>
           </h1>
-          <div className="mt-2.5 flex items-center gap-2">
-            <span className="h-px w-6 bg-slate-900/30" />
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-600">
-              Interactive BI Dashboard
-            </p>
+          <div className="mt-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-px w-6 bg-slate-900/30" />
+              <p className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-600">
+                Interactive BI Dashboard
+              </p>
+            </div>
+            <Link
+              href="/about"
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-600 hover:text-amber-700 transition-colors flex items-center gap-1"
+            >
+              About
+              <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M2 2h6M8 2v6M2 8L8 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
           </div>
         </div>
 
@@ -336,6 +348,19 @@ export default function FilterBoard({
             </p>
           </div>
         )}
+
+        {/* ── Footer ─────────────────────────────────────────────── */}
+        <div className="pt-4 mt-4 border-t border-slate-900/10 flex items-center justify-between">
+          <Link
+            href="/about"
+            className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-400 hover:text-amber-600 transition-colors"
+          >
+            About
+          </Link>
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-300">
+            © {new Date().getFullYear()} Datasaku
+          </span>
+        </div>
       </div>
     </div>
   );
