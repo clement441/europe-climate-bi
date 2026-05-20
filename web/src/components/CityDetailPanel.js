@@ -30,9 +30,9 @@ function Stat({ label, value, accent }) {
   const missing = value == null;
   return (
     <div className="flex items-baseline justify-between py-2 border-b border-slate-900/[0.06] last:border-b-0">
-      <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-slate-500">{label}</span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate-600">{label}</span>
       <span
-        className={`font-mono text-[12px] tabular-nums ${
+        className={`font-mono text-[13px] tabular-nums ${
           missing ? "text-slate-300" : (accent || "text-slate-900")
         }`}
       >
@@ -46,7 +46,7 @@ function SectionLabel({ children }) {
   return (
     <div className="flex items-center gap-2 mb-2">
       <span className="h-px w-3 bg-slate-900/30" />
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">{children}</p>
+      <p className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-600">{children}</p>
     </div>
   );
 }
@@ -89,7 +89,7 @@ function Sparkline({ data, loading }) {
       </svg>
       <div className="flex justify-between mt-0.5">
         {MONTH_INITIALS.map((m, i) => (
-          <span key={i} className="font-mono text-[8px] text-slate-300 w-[1ch] text-center">{m}</span>
+          <span key={i} className="font-mono text-[9px] text-slate-400 w-[1ch] text-center">{m}</span>
         ))}
       </div>
     </div>
@@ -123,7 +123,7 @@ function RingGauge({ score, color }) {
       <text
         x={size / 2} y={size / 2 + 28} textAnchor="middle"
         className="fill-slate-400"
-        style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, letterSpacing: "0.22em" }}
+        style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, letterSpacing: "0.22em" }}
       >
         / 100
       </text>
@@ -192,7 +192,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
         <button
           onClick={() => onToggleCompare?.(city)}
           aria-label={isPinned ? "Remove from comparison" : "Add to comparison"}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] transition-all ${
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] transition-all ${
             isPinned
               ? "bg-amber-500 text-white shadow-sm"
               : "ring-1 ring-slate-900/20 text-slate-500 hover:ring-amber-500/60 hover:text-amber-600"
@@ -214,7 +214,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
       <button
         onClick={() => onToggleCompare?.(city)}
         aria-label={isPinned ? "Remove from comparison" : "Add to comparison"}
-        className={`hidden sm:flex absolute top-4 right-14 z-20 items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] transition-all ${
+        className={`hidden sm:flex absolute top-4 right-14 z-20 items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono uppercase tracking-[0.18em] transition-all ${
           isPinned
             ? "bg-amber-500 text-white shadow-sm"
             : "ring-1 ring-slate-900/20 text-slate-500 hover:ring-amber-500/60 hover:text-amber-600"
@@ -236,7 +236,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
       <div className="px-6 pt-4 sm:pt-6 pb-5 border-b border-slate-900/10">
         <div className="flex items-center gap-2 mb-2">
           <Flag country={city.country} size="w40" alt={city.country} className="h-3.5 w-auto rounded-sm object-cover" />
-          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-500">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-600">
             {city.country?.trim()}
           </p>
         </div>
@@ -244,7 +244,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
           {city.city}
         </h2>
         {(city.lat != null && city.lon != null) && (
-          <div className="mt-2 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 tabular-nums">
+          <div className="mt-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500 tabular-nums">
             <span>{city.lat.toFixed(2)}°N</span>
             <span className="text-slate-300">/</span>
             <span>{city.lon.toFixed(2)}°E</span>
@@ -252,10 +252,10 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
         )}
         {city.risk_tier && (
           <div className="mt-3 flex items-center gap-2">
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-400">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
               Climate Risk
             </p>
-            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium ring-1 ${risk.bg} ${risk.text} ${risk.ringCls}`}>
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ring-1 ${risk.bg} ${risk.text} ${risk.ringCls}`}>
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: risk.ring }} />
               {city.risk_tier}
             </div>
@@ -282,7 +282,7 @@ export default function CityDetailPanel({ city, onClose, compareCities = [], onT
                 role="tab"
                 aria-selected={tab === t.key}
                 onClick={() => setTab(t.key)}
-                className={`relative flex-1 py-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors ${
+                className={`relative flex-1 py-3 font-mono text-[12px] uppercase tracking-[0.22em] transition-colors ${
                   tab === t.key ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
                 }`}
               >
@@ -317,16 +317,16 @@ function ClimateTab({ city, sparklineTemps, sparklineLoading }) {
     <div className="space-y-6">
       {/* Hero: projected warming */}
       <div className="bg-gradient-to-br from-amber-50/70 via-orange-50/30 to-rose-50/40 rounded-xl p-4 ring-1 ring-amber-900/[0.06]">
-        <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-amber-700/90 mb-2">
+        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-amber-700/90 mb-2">
           Projected Warming
         </p>
         <div className="flex items-baseline gap-2">
           <span className="font-serif italic text-[44px] leading-none text-slate-900 tabular-nums">
             {dT != null ? `${dT > 0 ? "+" : ""}${dT.toFixed(1)}` : "—"}
           </span>
-          <span className="font-mono text-[11px] text-slate-500 tracking-wide">°C by 2050</span>
+          <span className="font-mono text-[12px] text-slate-500 tracking-wide">°C by 2050</span>
         </div>
-        <div className="mt-2.5 flex items-center gap-2 font-mono text-[10px] tabular-nums text-slate-600">
+        <div className="mt-2.5 flex items-center gap-2 font-mono text-[12px] tabular-nums text-slate-600">
           <span>{baseT || "—"}</span>
           <svg className="w-3.5 h-3.5" viewBox="0 0 14 8" fill="none">
             <path d="M1 4 L11 4 M8 1 L11 4 L8 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -412,7 +412,7 @@ function ResilienceTab({ city, risk }) {
   if (city.resilience_score == null) {
     return (
       <div className="py-16 text-center">
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-slate-500">
           No resilience data
         </p>
       </div>
@@ -423,13 +423,13 @@ function ResilienceTab({ city, risk }) {
       <div className="flex flex-col items-center">
         <RingGauge score={city.resilience_score} color={risk.ring} />
         {city.risk_tier && (
-          <p className={`mt-2 font-mono text-[10px] uppercase tracking-[0.24em] ${risk.text}`}>
+          <p className={`mt-2 font-mono text-[11px] uppercase tracking-[0.24em] ${risk.text}`}>
             {city.risk_tier}
           </p>
         )}
       </div>
 
-      <p className="mt-6 text-[12px] leading-relaxed text-slate-600 text-center max-w-[290px]">
+      <p className="mt-6 text-[13px] leading-relaxed text-slate-700 text-center max-w-[290px]">
         Combines projected temperature trajectory, precipitation shift, and
         heat-day frequency into a single 0–100 measure of mid-century climate
         exposure. Higher scores indicate stronger resilience.

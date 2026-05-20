@@ -46,13 +46,13 @@ export default function FilterBoard({
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full ring-1 ring-slate-900/15 bg-white/60 min-w-0"
         >
           <Flag country={city.country} />
-          <span className="font-serif italic text-[13px] text-slate-900 flex-1 truncate leading-tight">
+          <span className="font-serif italic text-[14px] text-slate-900 flex-1 truncate leading-tight">
             {city.city}
           </span>
           <button
             onClick={() => onToggleCompare(city)}
             aria-label={`Remove ${city.city} from comparison`}
-            className="text-[9px] text-slate-400 hover:text-slate-900 transition-colors leading-none flex-shrink-0"
+            className="text-[11px] text-slate-400 hover:text-slate-900 transition-colors leading-none flex-shrink-0"
           >
             ✕
           </button>
@@ -90,7 +90,7 @@ export default function FilterBoard({
         key={`add-${slotIdx}`}
         onClick={() => onAddingCompareSlotChange(true)}
         disabled={!isActiveSlot}
-        className={`w-full px-2.5 py-1.5 rounded-full border border-dashed text-[10px] font-mono uppercase tracking-[0.22em] transition-colors ${
+        className={`w-full px-2.5 py-1.5 rounded-full border border-dashed text-[11.5px] font-mono uppercase tracking-[0.22em] transition-colors ${
           isActiveSlot
             ? "border-slate-300 text-slate-400 hover:border-amber-500/60 hover:text-amber-600 cursor-pointer"
             : "border-slate-200 text-slate-300 cursor-default"
@@ -119,7 +119,7 @@ export default function FilterBoard({
         <div className="w-full flex items-center justify-between px-5 pb-3.5 border-b border-slate-900/10">
           <span className="font-serif italic text-[18px] text-slate-900">Controls</span>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-600/90">
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-600/90">
               {MONTH_NAMES[month].slice(0, 3)} · {VARIABLE_SHORT[variable]}
             </span>
             <svg
@@ -137,7 +137,7 @@ export default function FilterBoard({
 
         {/* ── Header ─────────────────────────────────────────────── */}
         <div className="mb-5">
-          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-1.5">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500 mb-1.5">
             Climate Observatory
           </p>
           <h1 className="font-serif italic text-[24px] leading-[1.05] text-slate-900">
@@ -146,7 +146,7 @@ export default function FilterBoard({
           </h1>
           <div className="mt-2.5 flex items-center gap-2">
             <span className="h-px w-6 bg-slate-900/30" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+            <p className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-slate-600">
               Interactive BI Dashboard
             </p>
           </div>
@@ -160,13 +160,13 @@ export default function FilterBoard({
         {/* ── Month ──────────────────────────────────────────────── */}
         <div className="pt-4 mt-4 border-t border-slate-900/10">
           <div className="flex items-baseline justify-between mb-1.5">
-            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400">
+            <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500">
               Month
             </p>
             <button
               disabled
               title="Coming soon"
-              className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-slate-400 opacity-40 cursor-not-allowed"
+              className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-400 opacity-40 cursor-not-allowed"
             >
               <span className="text-[8px] leading-none">▶</span>
               Play
@@ -217,7 +217,7 @@ export default function FilterBoard({
               style={{ left: `calc(0.25rem + ${(month / 11) * 100}% - ${(month / 11) * 0.5}rem)` }}
             />
           </div>
-          <div className="mt-1.5 flex justify-between font-mono text-[8px] uppercase tracking-[0.18em] text-slate-400">
+          <div className="mt-1.5 flex justify-between font-mono text-[9.5px] uppercase tracking-[0.18em] text-slate-500">
             <span>Jan</span>
             <span>Jul</span>
             <span>Dec</span>
@@ -226,7 +226,7 @@ export default function FilterBoard({
 
         {/* ── Heatmap Variable ───────────────────────────────────── */}
         <div className="pt-4 mt-4 border-t border-slate-900/10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500 mb-2">
             Heatmap Variable
           </p>
           {/* Segmented control with sliding indicator */}
@@ -242,7 +242,7 @@ export default function FilterBoard({
               <button
                 key={key}
                 onClick={() => onVariableChange(key)}
-                className={`relative z-10 py-1.5 text-[11px] font-medium transition-colors ${
+                className={`relative z-10 py-1.5 text-[12px] font-medium transition-colors ${
                   variable === key ? "text-white" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -255,7 +255,7 @@ export default function FilterBoard({
               className="w-full h-1.5 rounded-full ring-1 ring-slate-900/[0.04]"
               style={{ background: stopsToGradient(STOP_MAP[variable]) }}
             />
-            <div className="flex justify-between mt-1.5 font-mono text-[9px] tabular-nums text-slate-500">
+            <div className="flex justify-between mt-1.5 font-mono text-[10.5px] tabular-nums text-slate-600">
               <span>{variables[variable].fixedMin} {unit}</span>
               <span>{variables[variable].fixedMax} {unit}</span>
             </div>
@@ -264,14 +264,14 @@ export default function FilterBoard({
 
         {/* ── City Bubbles ───────────────────────────────────────── */}
         <div className="pt-4 mt-4 border-t border-slate-900/10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500 mb-2">
             City Bubbles
           </p>
           <div className="relative">
             <select
               value={bubbleMetric}
               onChange={(e) => onBubbleMetricChange(e.target.value)}
-              className="w-full appearance-none px-3 py-2 pr-9 rounded-lg text-[12px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-900 border-0 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer transition-colors"
+              className="w-full appearance-none px-3 py-2 pr-9 rounded-lg text-[13px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-900 border-0 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer transition-colors"
             >
               {Object.entries(bubbleMetrics).map(([key, { label: lbl }]) => (
                 <option key={key} value={key}>{lbl}</option>
@@ -294,7 +294,7 @@ export default function FilterBoard({
                     : stopsToGradient(GREEN_RED_STOPS),
                 }}
               />
-              <div className="flex justify-between mt-1.5 font-mono text-[9px] tabular-nums text-slate-500">
+              <div className="flex justify-between mt-1.5 font-mono text-[10.5px] tabular-nums text-slate-600">
                 <span>{formatMetric(bMin, currentBubbleMetric)}</span>
                 <span>{formatMetric(bMax, currentBubbleMetric)}</span>
               </div>
@@ -312,7 +312,7 @@ export default function FilterBoard({
 
         {/* ── Compare tray (always visible) ──────────────────────── */}
         <div className="pt-4 mt-4 border-t border-slate-900/10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500 mb-2">
             Comparing
           </p>
           <div className="space-y-1.5">
@@ -321,7 +321,7 @@ export default function FilterBoard({
           {compareCities.length === 2 && (
             <button
               onClick={() => onViewCompare(compareCities[0])}
-              className="mt-2.5 w-full font-mono text-[9px] uppercase tracking-[0.22em] text-slate-600 hover:text-amber-600 transition-colors py-1.5 text-center"
+              className="mt-2.5 w-full font-mono text-[11px] uppercase tracking-[0.22em] text-slate-600 hover:text-amber-600 transition-colors py-1.5 text-center"
             >
               View comparison →
             </button>
@@ -331,7 +331,7 @@ export default function FilterBoard({
         {!selectedCity && (
           <div className="pt-4 mt-4 border-t border-slate-900/10 flex items-center gap-2">
             <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-slate-600">
               Click a city bubble for details
             </p>
           </div>

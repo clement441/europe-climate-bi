@@ -107,10 +107,10 @@ function MetricSection({ metric, cityA, cityB, climateData }) {
       <div className="flex items-center gap-2.5 mb-3">
         <span className="h-px flex-1 bg-slate-900/[0.07]" />
         <div className="text-center">
-          <p className="font-mono text-[8.5px] uppercase tracking-[0.28em] text-slate-500 leading-none">
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.28em] text-slate-600 leading-none">
             {metric.label}
           </p>
-          <p className="font-mono text-[7.5px] uppercase tracking-[0.2em] text-slate-300 mt-0.5 leading-none">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-400 mt-0.5 leading-none">
             {metric.sublabel}
           </p>
         </div>
@@ -143,7 +143,7 @@ function CityBarRow({ city, bar, formatted }) {
       </div>
 
       <div className="w-[52px] flex-shrink-0 text-right">
-        <span className="font-mono text-[11px] tabular-nums text-slate-900">
+        <span className="font-mono text-[12px] tabular-nums text-slate-900">
           {formatted}
         </span>
       </div>
@@ -169,7 +169,7 @@ export default function ComparePanel({ cities, onRemove, onCityClick, climateDat
           </div>
           <div className="flex flex-col items-center gap-1">
             <span className="h-px w-5 bg-slate-300" />
-            <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-slate-400">vs</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">vs</span>
             <span className="h-px w-5 bg-slate-300" />
           </div>
           <div className="text-center">
@@ -185,7 +185,7 @@ export default function ComparePanel({ cities, onRemove, onCityClick, climateDat
             {idx === firstClimateIdx && (
               <div className="mb-4 mt-2 flex items-center gap-2.5">
                 <span className="h-px flex-1 bg-amber-500/25" />
-                <p className="font-mono text-[8px] uppercase tracking-[0.28em] text-amber-700/60">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-amber-700/80">
                   {monthName} Climate
                 </p>
                 <span className="h-px flex-1 bg-amber-500/25" />
@@ -206,14 +206,14 @@ export default function ComparePanel({ cities, onRemove, onCityClick, climateDat
             <Flag country={city.country} />
             <button
               onClick={() => onCityClick?.(city)}
-              className="font-serif italic text-[12px] text-slate-900 truncate flex-1 text-left hover:text-amber-700 transition-colors"
+              className="font-serif italic text-[13px] text-slate-900 truncate flex-1 text-left hover:text-amber-700 transition-colors"
             >
               {city.city}
             </button>
             <button
               onClick={() => onRemove?.(city)}
               aria-label={`Remove ${city.city}`}
-              className="text-[9px] text-slate-400 hover:text-slate-900 transition-colors leading-none flex-shrink-0"
+              className="text-[11px] text-slate-400 hover:text-slate-900 transition-colors leading-none flex-shrink-0"
             >
               ✕
             </button>

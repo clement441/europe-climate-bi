@@ -102,7 +102,7 @@ export default function CitySearch({
   return (
     <div ref={containerRef} className="relative">
       {!hideLabel && (
-        <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400 mb-2">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500 mb-2">
           Locate
         </p>
       )}
@@ -130,7 +130,7 @@ export default function CitySearch({
           autoComplete="off"
           aria-label="Search city"
           disabled={!cities}
-          className="w-full pl-9 pr-8 py-2 rounded-lg text-[12px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-900 placeholder:font-normal placeholder:text-slate-400 border-0 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full pl-9 pr-8 py-2 rounded-lg text-[13px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-900 placeholder:font-normal placeholder:text-slate-400 border-0 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         />
 
         {query && (
@@ -201,7 +201,7 @@ function ResultRow({ city, active, onHover, onSelect }) {
           <span className="font-serif italic text-[14px] leading-tight text-slate-900 truncate">
             {city.city}
           </span>
-          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 leading-tight truncate flex-shrink-0 max-w-[40%]">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-slate-500 leading-tight truncate flex-shrink-0 max-w-[40%]">
             {city.country?.trim()}
           </span>
         </span>
@@ -225,10 +225,10 @@ function EmptyState() {
   return (
     <div className="px-4 py-5 flex flex-col items-center gap-1.5">
       <span className="h-px w-6 bg-slate-300" />
-      <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-slate-400">
+      <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-slate-500">
         No matches
       </p>
-      <p className="font-serif italic text-[11px] text-slate-400">
+      <p className="font-serif italic text-[12px] text-slate-500">
         Try a different spelling
       </p>
     </div>
